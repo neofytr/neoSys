@@ -1,21 +1,40 @@
 #include "buildsysdep/neobuild.h"
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
+
+#define CFLAGS "-O2 -Wall"
+#define LFLAGS NULL
 
 #define SRC "src/"
-#define BIN "bin/"
+#define SHELL "shell/"
+#define SYS "syscalls/"
 #define INC "inc/"
+#define BIN "bin/"
 
 int main(int argc, char **argv)
 {
+    int ret;
     neorebuild("neo.c", argv);
-    neo_compile_to_object_file(GCC, SRC "main.c", BIN "main.o", NULL, false);
-    neo_link(GCC, BIN "main", NULL, false, BIN "main.o");
-    int ret = system("rm " BIN "main.o");
-    if (ret < 0)
+
+    if (argc > 1 && !strcmp(argv[1], "clean"))
     {
-        NEO_LOG(1, "removal of main.o failed");
-        return EXIT_FAILURE;
+        ret = system("rm " BIN "shell.com");
+        if (ret < 0)
+        {
+            fprintf(stderr, "CLEAN FAILED!\n");
+            fprintf(stderr, "ERROR -> %s\n", strerror(errno));
+            return EXIT_FAILURE;
+        }
+
+        return EXIT_SUCCESS;
     }
+
+    neo_compile_to_object_file(GCC, SHELL SRC "shell.c", NULL, CFLAGS, false);
+    neo_compile_to_object_file(GCC, SYS SRC "sys.c", NULL, CFLAGS, false);
+
+    neo_link(GCC, BIN "shell.neo", LFLAGS, false, SHELL SRC "shell.o", SYS SRC "sys.o");
+
     return EXIT_SUCCESS;
 }
