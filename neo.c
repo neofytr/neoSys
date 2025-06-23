@@ -4,14 +4,16 @@
 #include <string.h>
 #include <errno.h>
 
-#define CFLAGS "-O2 -Wall"
-#define LFLAGS NULL
-
 #define SRC "src/"
 #define SHELL "shell/"
 #define SYS "syscalls/"
 #define INC "inc/"
 #define BIN "bin/"
+
+#define CFLAGS "-O2 -Wall "  \
+               "-I " SYS INC \
+               " -I " SHELL INC
+#define LFLAGS NULL
 
 int main(int argc, char **argv)
 {
@@ -20,7 +22,7 @@ int main(int argc, char **argv)
 
     if (argc > 1 && !strcmp(argv[1], "clean"))
     {
-        ret = system("rm " BIN "shell.com");
+        ret = system("rm " BIN "shell.com " SHELL SRC "shell.o " SYS SRC "sys.c ");
         if (ret < 0)
         {
             fprintf(stderr, "CLEAN FAILED!\n");
