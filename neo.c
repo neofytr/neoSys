@@ -17,13 +17,12 @@
 
 int main(int argc, char **argv)
 {
-    int ret;
     neorebuild("neo.c", argv);
 
     if (argc > 1 && !strcmp(argv[1], "clean"))
     {
-        ret = system("rm " BIN "shell.com " SHELL SRC "shell.o " SYS SRC "sys.o");
-        if (ret < 0)
+        int retval = system("rm " BIN "shell.com " SHELL SRC "shell.o " SYS SRC "sys.o");
+        if (retval < 0)
         {
             fprintf(stderr, "CLEAN FAILED!\n");
             fprintf(stderr, "ERROR -> %s\n", strerror(errno));
@@ -33,10 +32,23 @@ int main(int argc, char **argv)
         return EXIT_SUCCESS;
     }
 
-    neo_compile_to_object_file(GCC, SHELL SRC "shell.c", NULL, CFLAGS, false);
-    neo_compile_to_object_file(GCC, SYS SRC "sys.c", NULL, CFLAGS, false);
+    bool ret = neo_compile_to_object_file(GCC, SHELL SRC "shell.c", NULL, CFLAGS, false);
+    if (!ret)
+    {
+        return EXIT_FAILURE;
+    }
 
-    neo_link(GCC, BIN "shell.neo", LFLAGS, false, SHELL SRC "shell.o", SYS SRC "sys.o");
+    ret = neo_compile_to_object_file(GCC, SYS SRC "sys.c", NULL, CFLAGS, false);
+    if (!ret)
+    {
+        return EXIT_FAILURE;
+    }
+
+    ret = neo_link(GCC, BIN "shell.neo", LFLAGS, false, SHELL SRC "shell.o", SYS SRC "sys.o");
+    if (!ret)
+    {
+        return EXIT_FAILURE;
+    }
 
     return EXIT_SUCCESS;
 }
