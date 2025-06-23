@@ -1,7 +1,13 @@
 #include <sys.h>
 
-// functions private to the kernel
-private bool isopen(fd_t file); // check if the file desc file points to an open file
+#define MAX_OPEN_FILES (256)
+
+// variables private to the syscall api
+private bool open_fd[MAX_OPEN_FILES];
+
+// functions private to the syscall api
+private bool
+isopen(fd_t file); // check if the file desc file points to an open file
 
 static bool isopen(fd_t file)
 {
