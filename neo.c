@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
     if (argc > 1 && !strcmp(argv[1], "clean"))
     {
-        ret = system("rm " BIN "shell.com " SHELL SRC "shell.o " SYS SRC "sys.c ");
+        ret = system("rm " BIN "shell.com " SHELL SRC "shell.o " SYS SRC "sys.o");
         if (ret < 0)
         {
             fprintf(stderr, "CLEAN FAILED!\n");
