@@ -1,8 +1,8 @@
 #ifndef SYS_H
 #define SYS_H
 
-#define public         // these are functuons that are exported by the kernel to the user (syscall API)
-#define private static // static means only for that translation unit; these are functions used internally in the kernel
+#define public         // these are functions/variables that are exported by the kernel to the user (syscall API)
+#define private static // static means only for that translation unit; these are functions/variable used internally in the kernel
 
 // this file contains the headers for the system calls in the operating system neoSys
 
@@ -34,7 +34,7 @@ err_t errno;
 #define ErrBadFD (8) // the file descriptor onto which the function is being called is not associated
                      // with an open file
 
-uint8_t load(fd_t file);               // read one byte from the file descriptor file_desc
-uint8_t store(fd_t file, uint8_t chr); // store the byte data into the file descriptor file_desc
+public uint8_t load(fd_t file); // read one byte from the file descriptor file_desc
+public uint8_t store(fd_t file, uint8_t chr); // store the byte data into the file descriptor file_desc
 
 #endif
