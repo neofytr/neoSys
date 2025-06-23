@@ -1,8 +1,12 @@
 #ifndef SYS_H
 #define SYS_H
 
+#define public         // these are functuons that are exported by the kernel to the user (syscall API)
+#define private static // static means only for that translation unit; these are functions used internally in the kernel
+
 // this file contains the headers for the system calls in the operating system neoSys
 
+#include <stdbool.h>
 #include <stdint.h> // we will compile using -m16 for production since we are building
                     // a 16-bit OS for a 16-bit processor.
                     // so, we will get the correct int sizes for that machine when using standard C integers
