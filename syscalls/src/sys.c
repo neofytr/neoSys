@@ -3,10 +3,14 @@
 #define MAX_FD (1U << 8)
 
 // variables private to the syscall api
-private fd_t file_desc_arr[MAX_FD];
+private int file_desc_arr[MAX_FD]; // file_desc_arr[file] is the posix fd mapped to the neoSys fd file
+                                   // it's -1 if there is no mapping
 
 // functions private to the syscall api
 private bool isopen(fd_t file); // check if the file desc file points to an open file
+
+// macro functions private to the syscall api
+#define get_posix_fd(x) (file_desc_arr[(x)])
 
 private bool isopen(fd_t file)
 {
@@ -33,9 +37,12 @@ private bool isopen(fd_t file)
         return false;
     }
 
+    struct stat statbuf;
     // now we check if the mapped posix fd has an open file associated with it
-    if (fstat(posix_fd, NULL) == -1 && errno == EBADF)
+    if (fstat(posix_fd, &statbuf) == -1 && errno == EBADF)
     {
+        // fstat can possibly fail with EBADF or ENOMEM
+        // ENOMEM means the kernel is out of memory (very unlikely)
         return false;
         // EBADF means bad file descriptor
     }
