@@ -1,4 +1,6 @@
 #include <sys.h>
+#include <stdbool.h>
+#include <errnum.h>
 
 #define MAX_FD (1U << 8)
 
