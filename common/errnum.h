@@ -21,16 +21,26 @@ extern err_t errnum;
 
 // making this variable global results in making the entire OS single-threaded
 
-#define reterr(x)     \
+#define ret_err(x)    \
     do                \
     {                 \
         errnum = (x); \
-        return 0;     \
+        return false; \
+    } while (false)
+
+#define ret_success       \
+    do                    \
+    {                     \
+        errnum = SUCCESS; \
+        return true;      \
     } while (false)
 
 // here are some error codes and their meaning
 
+#define SUCCESS (0)
+
 #define ErrBadFD (8) // the file descriptor onto which the function is being called is not associated
                      // with an open file
+#define ErrIO (9)    // unspecified system IO failure
 
 #endif
