@@ -7,12 +7,14 @@
 #define SRC "src/"
 #define SHELL "shell/"
 #define SYS "syscalls/"
+#define COMMON "common/"
 #define INC "inc/"
 #define BIN "bin/"
 
-#define CFLAGS "-O2 -Wall "  \
-               "-I " SYS INC \
-               " -I " SHELL INC
+#define CFLAGS "-O2 -Wall "     \
+               "-I " SYS INC    \
+               " -I " SHELL INC \
+               " -I " COMMON
 #define LFLAGS NULL
 
 int main(int argc, char **argv)

@@ -1,3 +1,5 @@
+#define INSIDE_SYS
+
 #include <sys.h>
 #include <stdbool.h>
 #include <errnum.h>

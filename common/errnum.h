@@ -6,8 +6,14 @@
 
 typedef uint16_t err_t;
 
+#ifdef INSIDE_SYS
 public
-err_t errnum;
+err_t errnum; // there should only be one copy of this variable, and that should
+              // be inside the OS, in sys.c
+              // rest all files should refer to that copy only
+#else
+extern err_t errnum;
+#endif
 
 // our OS api functions will return zero on error and 1 on success
 // the global variable errno will be set to indicate the error in the most recent
