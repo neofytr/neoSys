@@ -4,6 +4,11 @@
 #include <stdbool.h>
 #include <errnum.h>
 
+#include <sys/stat.h> // for using fstat during building
+#include <errno.h>    // for checking the error returned by fstat
+
+#include <unistd.h> // for posix read/write function
+
 #define MAX_FD (1U << 8)
 
 // variables private to the syscall api
@@ -29,8 +34,6 @@ private bool isopen(const fd_t file); // check if the file desc file points to a
 private bool isopen(const fd_t file)
 {
     // checks if the neoSys fd file is associated with some open file (this meaning will be clear in production)
-#include <sys/stat.h> // for using fstat during building
-#include <errno.h>    // for checking the error returned by fstat
 
     if (file < 3)
     {
@@ -77,7 +80,6 @@ public bool store(const fd_t file, const uint8_t chr)
     // get_posix_id won't fail since we have successfuly come out of the isopen function
     posix_fd = get_posix_fd(file);
 
-#include <unistd.h> // for posix read/write function
     ret = write(posix_fd, (void *)&chr, 1);
     if (ret != 1)
     {
@@ -87,7 +89,7 @@ public bool store(const fd_t file, const uint8_t chr)
     ret_success;
 }
 
-private uint8_t load(const fd_t file)
+public uint8_t load(const fd_t file)
 {
     int ret;
     int posix_fd;

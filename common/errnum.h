@@ -12,7 +12,7 @@ err_t errnum; // there should only be one copy of this variable, and that should
               // be inside the OS, in sys.c
               // rest all files should refer to that copy only
 #else
-extern err_t errnum;
+extern public err_t errnum;
 #endif
 
 // our OS api functions will return zero on error and 1 on success
@@ -37,7 +37,7 @@ extern err_t errnum;
 
 // here are some error codes and their meaning
 
-#define SUCCESS (0)
+#define SUCCESS (0) // errnum will be set to this upon success
 
 #define ErrBadFD (8) // the file descriptor onto which the function is being called is not associated
                      // with an open file

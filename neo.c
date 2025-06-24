@@ -19,11 +19,11 @@
 
 int main(int argc, char **argv)
 {
-    neorebuild("neo.c", argv);
+    neorebuild("neo.c", argv, &argc);
 
     if (argc > 1 && !strcmp(argv[1], "clean"))
     {
-        int retval = system("rm " BIN "shell.com " SHELL SRC "shell.o " SYS SRC "sys.o");
+        int retval = system("rm " BIN "shell.neo " SHELL SRC "shell.o " SYS SRC "sys.o");
         if (retval < 0)
         {
             fprintf(stderr, "CLEAN FAILED!\n");

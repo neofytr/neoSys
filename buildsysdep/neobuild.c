@@ -197,7 +197,7 @@ bool neo_link_null(neocompiler_t compiler, const char *executable, const char *l
 
     int status, code;
     bool result = neocmd_run_sync(cmd, &status, &code, false);
-    if (result || code)
+    if (!result && !code)
     {
         char msg[MAX_TEMP_STRLEN];
         snprintf(msg, sizeof(msg), "[%s] Linking failed for '%s'", __func__, executable);
@@ -702,7 +702,7 @@ bool neo_mkdir(const char *dir_path, mode_t dir_mode)
     return true;
 }
 
-bool neorebuild(const char *build_file_c, char **argv)
+bool neorebuild(const char *build_file_c, char **argv, int *argc)
 {
     if (!argv)
         return true;
@@ -712,7 +712,10 @@ bool neorebuild(const char *build_file_c, char **argv)
     while (*temp)
     {
         if (!strcmp(*temp, "--no-rebuild"))
+        {
+            (*argc)--;
             return true;
+        }
         temp++;
     }
 
