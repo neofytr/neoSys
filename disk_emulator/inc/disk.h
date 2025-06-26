@@ -18,6 +18,8 @@ typedef struct
     uint8_t drive;   // drive number
 } disk_t;
 
+public
+void test();
 internal disk_t *d_attach(uint8_t drive_num);
 internal bool d_detach(disk_t *disk);
 internal void d_show(disk_t *disk);

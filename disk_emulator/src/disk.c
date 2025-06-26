@@ -11,6 +11,14 @@
 // if drive D is attached, it will have it's 2nd LSB set and so on
 internal uint8_t attached = 0;
 
+public void test()
+{
+    disk_t *disk = d_attach(DriveC);
+    d_show(disk);
+
+    return;
+}
+
 internal void d_show(disk_t *disk)
 {
     if (!disk)
