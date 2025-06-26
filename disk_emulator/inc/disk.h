@@ -9,6 +9,7 @@
 #define DriveD 0x20 // 0010
 
 #define DRIVE_BASE_PATH "/home/raj/Desktop/neoSys/disk_emulator/drives/disk."
+#define BLOCK_SIZE (512)
 
 typedef internal struct packed
 {
