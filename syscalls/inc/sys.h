@@ -3,6 +3,9 @@
 
 #include <base.h>
 
+// lower areas of memory will be where the OS will reside
+// these are outside of access rights of user space
+
 // this file contains the headers for the system calls in the operating system neoSys
 #include <stdint.h> // we will compile using -m16 for production since we are building
                     // a 16-bit OS for a 16-bit processor.

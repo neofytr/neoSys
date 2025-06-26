@@ -24,5 +24,6 @@ internal drive_t *d_attach(uint8_t drive_num);
 internal bool d_detach(drive_t *drive);
 internal void d_show(drive_t *drive);
 internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num);
+internal bool d_write(drive_t *drive, uint8_t *src, uint16_t block_num);
 
 #endif

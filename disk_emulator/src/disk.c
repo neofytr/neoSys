@@ -6,6 +6,8 @@
 #include <unistd.h>   // for close()
 #include <sys/stat.h> // for fstat()
 
+#define is_pow_of_two(num) (!((num) & (num - 1)))
+
 // a bit-wise flag to see if a drive is attached or not
 // if drive C is attached, it will have it's LSB set
 // if drive D is attached, it will have it's 2nd LSB set and so on
@@ -26,7 +28,37 @@ internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
         return false;
     }
 
-    
+    if (lseek(drive->fd, block_num * BLOCK_SIZE, SEEK_SET) < 0)
+    {
+        return false;
+    }
+
+    if (read(drive->fd, (void *)dest, BLOCK_SIZE) < BLOCK_SIZE)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+internal bool d_write(drive_t *drive, uint8_t *src, uint16_t block_num)
+{
+    if (!drive || !src)
+    {
+        return false;
+    }
+
+    if (lseek(drive->fd, block_num * BLOCK_SIZE, SEEK_SET) < 0)
+    {
+        return false;
+    }
+
+    if (write(drive->fd, (void *)src, BLOCK_SIZE) < BLOCK_SIZE)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 internal void d_show(drive_t *drive)
@@ -109,7 +141,16 @@ internal drive_t *d_attach(uint8_t drive_num)
         return NULL;
     }
 
-    drive->blocks = (uint16_t)sbuf.st_blocks; // it's the number of 512B blocks allocated for the file
+    // the number of blocks we allocate from the file into the drive will be file_size / BLOCK_SIZE
+    if (is_pow_of_two(sbuf.st_blocks))
+    {
+        drive->blocks = sbuf.st_blocks;
+    }
+    else
+    {
+        drive->blocks = sbuf.st_blocks - 1;
+    }
+
     drive->drive = drive_num;
     attached |= drive_num;
 
