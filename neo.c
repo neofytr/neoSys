@@ -7,7 +7,7 @@
 #define SRC "src/"
 #define SHELL "shell/"
 #define SYS "syscalls/"
-#define EMU "disk_emulator/"
+#define disk "disk_emulator/"
 #define COMMON "common/"
 #define INC "inc/"
 #define BIN "bin/"
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    ret = neo_compile_to_object_file(GCC, EMU SRC "emu.c", NULL, CFLAGS, false);
+    ret = neo_compile_to_object_file(GCC, disk SRC "disk.c", NULL, CFLAGS, false);
     if (!ret)
     {
         return EXIT_FAILURE;
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 
     neocmd_append(&cmd, "gcc", "-o bin/osapi.so");
     neocmd_append(&cmd, SO_FLAGS);
-    neocmd_append(&cmd, "sys.o emu.o");
+    neocmd_append(&cmd, "sys.o disk.o");
 
     return EXIT_SUCCESS;
 }
