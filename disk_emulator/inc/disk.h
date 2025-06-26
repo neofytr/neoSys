@@ -26,4 +26,13 @@ internal void d_show(drive_t *drive);
 internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num);
 internal bool d_write(drive_t *drive, uint8_t *src, uint16_t block_num);
 
+// this will be true if and only if all the three statements return true
+// which is possible only if all the stuff happens correctly
+// so, this behaves the same way as d_read and d_write
+#define dio(func, drive, ptr, num) (drive) &&                                                    \
+                                       (lseek((drive)->fd, BLOCK_SIZE * num, SEEK_SET) != -1) && \
+                                       (func((drive)->fd, ptr, BLOCK_SIZE) == BLOCK_SIZE)
+#define dread(drive, dest, block_num) dio(read, drive, dest, block_num)
+#define dwrite(drive, src, block_num) dio(write, drive, src, block_num)
+
 #endif
