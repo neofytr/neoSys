@@ -2,6 +2,30 @@
 #include <errno.h>    // for checking the error returned by fstat
 #include <sys/stat.h> // for using fstat during building
 
+internal void copy(void *dst, void *src, uint16_t n)
+{
+    if (!dst || !src || !n)
+    {
+        return;
+    }
+
+    // for safely handling the overlapping case
+    // first copy the source data into a separate buffer first
+    // then copy the data from this buffer onto the destination
+    uint8_t buf[UINT16_MAX];
+    for (uint16_t index = 0; index < n; index++)
+    {
+        buf[index] = ((uint8_t *)src)[index];
+    }
+
+    for (uint16_t index = 0; index < n; index++)
+    {
+        ((uint8_t *)dst)[index] = buf[index];
+    }
+
+    return;
+}
+
 internal bool isopen(const fd_t file)
 {
     // checks if the neoSys fd file is associated with some open file (this meaning will be clear in production)

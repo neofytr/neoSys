@@ -1,3 +1,5 @@
+#ifndef DISK_H
+#define DISK_H
 #include <base.h>
 #include <stdint.h>
 
@@ -16,3 +18,5 @@ typedef internal struct packed
 
 internal disk_t *d_attach(uint8_t drive_num);
 internal void d_detach(disk_t *disk);
+
+#endif

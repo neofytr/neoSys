@@ -30,7 +30,7 @@ extern int *file_desc_arr;
 
 #define get_posix_fd(x) (file_desc_arr[(x)])
 
-internal bool isopen(const fd_t file);         // check if the file desc file points to an open file
-internal bool zero(void *mem, uint16_t bytes); // zeroes bytes number of bytes, starting at mem
-
+internal bool isopen(const fd_t file);                        // check if the file desc file points to an open file
+internal bool zero(void *mem, uint16_t bytes);                // zeroes bytes number of bytes, starting at mem
+internal void copy(void *dest, void *source, uint16_t bytes); // copies bytes number of bytes from source to destination; correctly handles overlapping regions
 #endif
