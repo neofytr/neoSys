@@ -18,6 +18,24 @@ public void test()
     drive_t *drive = d_attach(DriveC);
     d_show(drive);
 
+    uint8_t buf[BLOCK_SIZE] = {
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+    };
+    d_write(drive, buf, 12);
+
+    uint8_t dst[BLOCK_SIZE];
+    d_read(drive, dst, 12);
+
+    for (int index = 0; index < 10; index++)
+    {
+        printf("%d\n", dst[index]);
+    }
+
     return;
 }
 
