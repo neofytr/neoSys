@@ -11,7 +11,7 @@
 #define DRIVE_BASE_PATH "/home/raj/Desktop/neoSys/disk_emulator/drives/drive."
 #define BLOCK_SIZE (512)
 
-typedef internal struct
+typedef struct
 {
     int fd;          // the file descriptor backing this disk
     uint16_t blocks; // number of blocks in the disk
