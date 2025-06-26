@@ -2,11 +2,42 @@
 #include <errno.h>    // for checking the error returned by fstat
 #include <sys/stat.h> // for using fstat during building
 
-internal void copy(void *dst, void *src, uint16_t n)
+internal bool set(void *mem, uint16_t n, uint8_t c)
+{
+    if (!mem)
+    {
+        return false;
+    }
+
+    for (uint16_t index = 0; index < n; index++)
+    {
+        ((uint8_t *)mem)[index] = c;
+    }
+
+    return true;
+}
+
+internal uint16_t stringlen(void *str)
+{
+    if (!str)
+    {
+        return 0;
+    }
+
+    uint16_t len = 0;
+    while (*((uint8_t *)str++))
+    {
+        len++;
+    }
+
+    return len;
+}
+
+internal bool copy(void *dst, void *src, uint16_t n)
 {
     if (!dst || !src || !n)
     {
-        return;
+        return false;
     }
 
     // for safely handling the overlapping case
@@ -23,7 +54,7 @@ internal void copy(void *dst, void *src, uint16_t n)
         ((uint8_t *)dst)[index] = buf[index];
     }
 
-    return;
+    return true;
 }
 
 internal bool isopen(const fd_t file)
