@@ -4,6 +4,8 @@
 // Define NULL
 #define NULL ((void *)0)
 
+#define packed __attribute__((packed)) // no padding in the structure
+
 /*
  * ----------------------------------------------------------------------------
  * Symbol Visibility Reference (for shared libraries / kernel modularity)
