@@ -19,6 +19,7 @@
                " -I " SYS INC    \
                " -I " SHELL INC  \
                " -I " OSAPI INC  \
+               " -I " DISK INC   \
                " -I " COMMON
 #define LFLAGS NULL
 
@@ -36,7 +37,8 @@ int main(int argc, char **argv)
         neocmd_append(rm, DISK SRC "disk.o");
         neocmd_append(rm, SHELL SRC "shell.o");
         neocmd_append(rm, SYS SRC "sys.o");
-        neocmd_append(rm, OSAPI SRC "os.o");
+        neocmd_append(rm, OSAPI SRC "osapi.o");
+        neocmd_append(rm, BIN "libos.so shell.neo");
 
         neocmd_run_sync(rm, NULL, NULL, false);
         neocmd_delete(rm);
@@ -74,7 +76,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-    neocmd_append(cmd, "gcc", "-o bin/os.so");
+    neocmd_append(cmd, "gcc", "-o bin/libos.so");
     neocmd_append(cmd, SO_FLAGS);
     neocmd_append(cmd, SYS SRC "sys.o");
     neocmd_append(cmd, DISK SRC "disk.o");
@@ -82,5 +84,9 @@ int main(int argc, char **argv)
 
     neocmd_run_sync(cmd, NULL, NULL, false);
     neocmd_delete(cmd);
+
+    neo_link(GCC, BIN "shell.neo", "-L " BIN " -los"
+                                   " -Wl,-rpath=./bin",
+             false, SHELL SRC "shell.o");
     return EXIT_SUCCESS;
 }
