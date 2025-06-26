@@ -33,6 +33,63 @@ internal uint16_t stringlen(void *str)
     return len;
 }
 
+internal uint8_t *strnum(uint8_t *str, uint8_t num)
+{
+    if (!str)
+    {
+        return NULL;
+    }
+
+    static uint8_t buf[UINT8_MAX] = {0};
+    uint16_t len = stringlen(str);
+
+    if (len >= 256)
+    {
+        return NULL;
+    }
+
+    // copy input string to buffer
+    for (uint16_t index = 0; index < len; index++)
+    {
+        buf[index] = str[index];
+    }
+
+    // convert number to decimal digits and append
+    // handle special case of 0
+    if (num == 0)
+    {
+        if (len < 255) // ensure space for digit and null terminator
+        {
+            buf[len++] = '0';
+        }
+    }
+    else
+    {
+        // find the highest power of 10 <= num
+        uint8_t temp = num;
+        uint16_t divisor = 1;
+        while (temp >= 10)
+        {
+            temp /= 10;
+            divisor *= 10;
+        }
+
+        // extract digits from most significant to least significant
+        while (divisor > 0 && len < 255) // ensure space for null terminator
+        {
+            uint8_t digit = num / divisor;
+            buf[len++] = '0' + digit;
+            num %= divisor;
+            divisor /= 10;
+        }
+    }
+
+    // null terminate the result
+    buf[len] = '\0';
+
+    return buf;
+}
+
 internal bool copy(void *dst, void *src, uint16_t n)
 {
     if (!dst || !src || !n)

@@ -34,4 +34,7 @@ internal uint16_t stringlen(void *str);                       // length of a tra
 internal bool isopen(const fd_t file);                        // check if the file desc file points to an open file
 internal bool zero(void *mem, uint16_t bytes);                // zeroes bytes number of bytes, starting at mem
 internal bool copy(void *dest, void *source, uint16_t bytes); // copies bytes number of bytes from source to destination; correctly handles overlapping regions
+internal uint8_t *strnum(uint8_t *str, uint8_t num);          // returns a pointer to a static piece of memory (static string) that is the string str with the number num in decimal appended to it
+                                                              // the maximum length of the final string is 256; so, overflow can occur if the binary rep of the number makes the string longer than 256, in which case, the
+                                                              // requisite lower digits of num will be left out in the resultant string
 #endif

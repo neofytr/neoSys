@@ -2,6 +2,7 @@
 #define DISK_H
 #include <base.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 // we support only two drives for now, C and D
 #define DriveC 0x01 // 0001
@@ -17,6 +18,6 @@ typedef internal struct packed
 } disk_t;
 
 internal disk_t *d_attach(uint8_t drive_num);
-internal void d_detach(disk_t *disk);
+internal bool d_detach(disk_t *disk);
 
 #endif
