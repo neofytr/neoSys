@@ -6,52 +6,62 @@
 #include <unistd.h>   // for close()
 #include <sys/stat.h> // for fstat()
 
-// a bit-wise flag to see if a disk is attached or not
+// a bit-wise flag to see if a drive is attached or not
 // if drive C is attached, it will have it's LSB set
 // if drive D is attached, it will have it's 2nd LSB set and so on
 internal uint8_t attached = 0;
 
 public void test()
 {
-    disk_t *disk = d_attach(DriveC);
-    d_show(disk);
+    drive_t *drive = d_attach(DriveC);
+    d_show(drive);
 
     return;
 }
 
-internal void d_show(disk_t *disk)
+internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
 {
-    if (!disk)
-    {
-        fprintf(stdout, "Error -> Invalid disk argument\n");
-        return;
-    }
-
-    fprintf(stdout, "Disk Info:\n");
-    fprintf(stdout, "  File Descriptor : %d\n", disk->fd);
-    fprintf(stdout, "  Number of Blocks: %u\n", disk->blocks);
-    fprintf(stdout, "  Drive Number    : %u\n", disk->drive);
-
-    return;
-}
-
-internal bool d_detach(disk_t *disk)
-{
-    if (!disk)
+    if (!drive || !dest)
     {
         return false;
     }
 
-    attached &= ~(disk->drive); // turn off the drive number in the attached
-    close(disk->fd);
-    free(disk);
+    
+}
+
+internal void d_show(drive_t *drive)
+{
+    if (!drive)
+    {
+        fprintf(stdout, "Error -> Invalid drive argument\n");
+        return;
+    }
+
+    fprintf(stdout, "drive Info:\n");
+    fprintf(stdout, "  File Descriptor : %d\n", drive->fd);
+    fprintf(stdout, "  Number of Blocks: %u\n", drive->blocks);
+    fprintf(stdout, "  Drive Number    : %u\n", drive->drive);
+
+    return;
+}
+
+internal bool d_detach(drive_t *drive)
+{
+    if (!drive)
+    {
+        return false;
+    }
+
+    attached &= ~(drive->drive); // turn off the drive number in the attached
+    close(drive->fd);
+    free(drive);
 
     return true;
 }
 
-internal disk_t *d_attach(uint8_t drive_num)
+internal drive_t *d_attach(uint8_t drive_num)
 {
-    disk_t *disk;
+    drive_t *drive;
     uint8_t *file;
     int ret;
     struct stat sbuf;
@@ -67,8 +77,8 @@ internal disk_t *d_attach(uint8_t drive_num)
         return NULL;
     }
 
-    disk = malloc(sizeof(disk_t));
-    if (!disk)
+    drive = malloc(sizeof(drive_t));
+    if (!drive)
     {
         return NULL;
     }
@@ -76,32 +86,32 @@ internal disk_t *d_attach(uint8_t drive_num)
     file = strnum((uint8_t *)DRIVE_BASE_PATH, drive_num);
     if (!file)
     {
-        free(disk);
+        free(drive);
         return NULL;
     }
 
     printf("%s\n", file);
 
-    ret = open((const char *)file, O_RDONLY);
+    ret = open((const char *)file, O_RDWR);
     if (ret < 0)
     {
-        free(disk);
+        free(drive);
         perror("open");
         return NULL;
     }
-    disk->fd = ret;
+    drive->fd = ret;
 
-    ret = fstat(disk->fd, &sbuf);
+    ret = fstat(drive->fd, &sbuf);
     if (ret < 0)
     {
-        close(disk->fd);
-        free(disk);
+        close(drive->fd);
+        free(drive);
         return NULL;
     }
 
-    disk->blocks = (uint16_t)sbuf.st_blocks; // it's the number of 512B blocks allocated for the file
-    disk->drive = drive_num;
+    drive->blocks = (uint16_t)sbuf.st_blocks; // it's the number of 512B blocks allocated for the file
+    drive->drive = drive_num;
     attached |= drive_num;
 
-    return disk;
+    return drive;
 }

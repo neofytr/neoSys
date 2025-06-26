@@ -13,15 +13,16 @@
 
 typedef struct
 {
-    int fd;          // the file descriptor backing this disk
-    uint16_t blocks; // number of blocks in the disk
+    int fd;          // the file descriptor backing this drive
+    uint16_t blocks; // number of blocks in the drive
     uint8_t drive;   // drive number
-} disk_t;
+} drive_t;
 
 public
 void test();
-internal disk_t *d_attach(uint8_t drive_num);
-internal bool d_detach(disk_t *disk);
-internal void d_show(disk_t *disk);
+internal drive_t *d_attach(uint8_t drive_num);
+internal bool d_detach(drive_t *drive);
+internal void d_show(drive_t *drive);
+internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num);
 
 #endif

@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "compare": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "stdio.h": "c"
     }
 }
