@@ -79,9 +79,11 @@ typedef internal struct
 
     uint16_t file_size;                 // file size in bytes
     filename_t file_name;               // file name and extension
-    uint8_t *indirect_ptr;              // points to block containing 256 data block pointers
-    uint8_t *direct_ptr[PTR_PER_INODE]; // direct pointers to first 8 data blocks
+    uint16_t indirect_ptr;              // block number of a block containing 256 data block numbers
+    uint16_t direct_ptr[PTR_PER_INODE]; // block numbers of the first 8 data blocks
 } inode_t;
+
+typedef internal uint8_t *bitmap_t;
 
 /*
  * filesystem descriptor: main structure for mounted filesystem
@@ -91,7 +93,7 @@ typedef internal struct
 {
     uint8_t drive_num;        // which physical drive this filesystem is on
     drive_t *drive;           // pointer to drive hardware descriptor
-    bool *bitmap;             // free/used block tracking bitmap
+    bitmap_t bitmap;          // free/used block tracking bitmap (bit r of bitmap is linked to block r; 0 <= r < block_num)
     superblock_t super_block; // copy of superblock for quick access
 } filesys_t;
 
@@ -108,6 +110,7 @@ typedef internal union
 } datablock_t;
 
 internal filesys_t fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
+internal bitmap_t mkbitmap(drive_t *drive, bool scan); // returns NULL upon failure
 
 #undef FILENAME_LEN
 #undef FILEEXT_LEN
