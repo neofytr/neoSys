@@ -171,20 +171,6 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     filesys->drive = drive;
     filesys->drive_num = drive->drive_num;
 
-    // create initial bitmap (no scanning needed for fresh format)
-    filesys->bitmap = mkbitmap(filesys, false);
-    if (!filesys->bitmap)
-    {
-        free(filesys);
-        return NULL;
-    }
-
-    // mark system blocks as used
-    for (uint16_t i = 0; i <= inode_blocks; i++)
-    {
-        set_bit(filesys->bitmap, i);
-    }
-
     // write superblock to drive
     if (!d_write(drive, &filesys->super_block, 0))
     {
@@ -223,6 +209,14 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
             free(filesys);
             return NULL;
         }
+    }
+
+    // create initial
+    filesys->bitmap = mkbitmap(filesys, true);
+    if (!filesys->bitmap)
+    {
+        free(filesys);
+        return NULL;
     }
 
     return filesys;
