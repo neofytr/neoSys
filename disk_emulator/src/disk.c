@@ -90,7 +90,7 @@ internal void d_show(drive_t *drive)
     fprintf(stdout, "drive Info:\n");
     fprintf(stdout, "  File Descriptor : %d\n", drive->fd);
     fprintf(stdout, "  Number of Blocks: %u\n", drive->blocks);
-    fprintf(stdout, "  Drive Number    : %u\n", drive->drive);
+    fprintf(stdout, "  Drive Number    : %u\n", drive->drive_num);
 
     return;
 }
@@ -102,7 +102,7 @@ internal bool d_detach(drive_t *drive)
         return false;
     }
 
-    attached &= ~(drive->drive); // turn off the drive number in the attached
+    attached &= ~(drive->drive_num); // turn off the drive number in the attached
     close(drive->fd);
     free(drive);
 
@@ -169,7 +169,7 @@ internal drive_t *d_attach(uint8_t drive_num)
         drive->blocks = sbuf.st_blocks - 1;
     }
 
-    drive->drive = drive_num;
+    drive->drive_num = drive_num;
     attached |= drive_num;
 
     return drive;

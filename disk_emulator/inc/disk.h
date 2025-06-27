@@ -13,9 +13,9 @@
 
 typedef struct
 {
-    int fd;          // the file descriptor backing this drive
-    uint16_t blocks; // number of blocks in the drive; blocks are numbered from 0 to blocks - 1
-    uint8_t drive;   // drive number
+    int fd;            // the file descriptor backing this drive
+    uint16_t blocks;   // number of blocks in the drive; blocks are numbered from 0 to blocks - 1
+    uint8_t drive_num; // drive number
 } drive_t;
 
 public

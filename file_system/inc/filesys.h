@@ -62,6 +62,12 @@ typedef internal struct
     uint8_t extension[FILEEXT_LEN]; // extension part (e.g., "txt")
 } filename_t;
 
+typedef internal enum {
+    TYPE_NOT_VALID = 0x00,
+    TYPE_FILE = 0x01,
+    TYPE_DIR = 0x03,
+} filetype_t;
+
 /*
  * inode: represents a single file or directory
  * contains all metadata and pointers to locate the file's data
@@ -69,12 +75,7 @@ typedef internal struct
 typedef internal struct
 {
     // file status and type information packed into single byte
-    packed struct
-    {
-        uint8_t reserved : 4; // reserved bits for future use
-        uint8_t type : 3;     // file type (regular file, directory, etc.)
-        bool valid : 1;       // whether this inode is in use
-    } valid_type;
+    filetype_t file_type;
 
     uint16_t file_size;                 // file size in bytes
     filename_t file_name;               // file name and extension
@@ -88,10 +89,10 @@ typedef internal struct
  */
 typedef internal struct
 {
-    uint8_t drive_num;     // which physical drive this filesystem is on
-    drive_t *drive;        // pointer to drive hardware descriptor
-    bool *bitmap;          // free/used block tracking bitmap
-    superblock_t metadata; // copy of superblock for quick access
+    uint8_t drive_num;        // which physical drive this filesystem is on
+    drive_t *drive;           // pointer to drive hardware descriptor
+    bool *bitmap;             // free/used block tracking bitmap
+    superblock_t super_block; // copy of superblock for quick access
 } filesys_t;
 
 /*
@@ -106,7 +107,7 @@ typedef internal union
     inode_t inode;               // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
-internal filesys_t fs_format(drive_t *drive, bootsec_t *boot_sector);
+internal filesys_t fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
 
 #undef FILENAME_LEN
 #undef FILEEXT_LEN
