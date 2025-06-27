@@ -165,3 +165,13 @@ internal bool zero(void *mem, uint16_t bytes)
 
     return true;
 }
+
+internal uint16_t openfiles(drive_t *drive)
+{
+    return 0;
+}
+
+internal void erase_all_files(drive_t *drive)
+{
+    return;
+}

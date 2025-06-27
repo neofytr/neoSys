@@ -41,7 +41,7 @@ typedef uint8_t bootsec_t[BOOT_SECTOR_SIZE];
  * superblock: the first block (block 0) of the filesystem
  * contains all metadata needed to understand the filesystem layout
  */
-typedef internal struct
+typedef struct
 {
     bootsec_t boot_sector; // space for bootloader code
     uint16_t reserved;     // padding/future use
@@ -56,13 +56,14 @@ typedef internal struct
  * filename structure: stores file name in 8.3 format
  * separate name and extension fields for easier manipulation
  */
-typedef internal struct
+typedef struct
 {
     uint8_t name[FILENAME_LEN];     // filename part (e.g., "document")
     uint8_t extension[FILEEXT_LEN]; // extension part (e.g., "txt")
 } filename_t;
 
-typedef internal enum {
+typedef enum
+{
     TYPE_NOT_VALID = 0x00,
     TYPE_FILE = 0x01,
     TYPE_DIR = 0x03,
@@ -72,7 +73,7 @@ typedef internal enum {
  * inode: represents a single file or directory
  * contains all metadata and pointers to locate the file's data
  */
-typedef internal struct
+typedef struct
 {
     // file status and type information packed into single byte
     filetype_t file_type;
@@ -83,13 +84,13 @@ typedef internal struct
     uint16_t direct_ptr[PTR_PER_INODE]; // block numbers of the first 8 data blocks
 } inode_t;
 
-typedef internal uint8_t *bitmap_t;
+typedef uint8_t *bitmap_t;
 
 /*
  * filesystem descriptor: main structure for mounted filesystem
  * contains all information needed to access files on this filesystem
  */
-typedef internal struct
+typedef struct
 {
     uint8_t drive_num;        // which physical drive this filesystem is on
     drive_t *drive;           // pointer to drive hardware descriptor
@@ -101,7 +102,7 @@ typedef internal struct
  * generic data block union: represents different uses of a 512-byte block
  * allows same memory to be interpreted as different data types
  */
-typedef internal union
+typedef union
 {
     superblock_t superblock;     // when block 0 contains filesystem metadata
     uint8_t data[BLOCK_SIZE];    // when block contains raw file data
@@ -109,15 +110,11 @@ typedef internal union
     inode_t inode;               // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
-internal void set_bit(bitmap_t bitmap, uint16_t block_num);
-internal void clear_bit(bitmap_t bitmap, uint16_t block_num);
-internal bool get_bit(bitmap_t bitmap, uint16_t block_num);
+void set_bit(bitmap_t bitmap, uint16_t block_num);
+void clear_bit(bitmap_t bitmap, uint16_t block_num);
+bool get_bit(bitmap_t bitmap, uint16_t block_num);
 
-internal filesys_t fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
-internal bitmap_t mkbitmap(drive_t *drive, bool scan); // returns NULL upon failure
-
-#undef FILENAME_LEN
-#undef FILEEXT_LEN
-#undef BOOT_SECTOR_SIZE
+filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
+bitmap_t mkbitmap(filesys_t *drive, bool scan); // returns NULL upon failure
 
 #endif // FILESYS_H

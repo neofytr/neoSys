@@ -172,7 +172,7 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     filesys->drive_num = drive->drive_num;
 
     // write superblock to drive
-    if (!d_write(drive, &filesys->super_block, 0))
+    if (!d_write(drive, (uint8_t *)&filesys->super_block, 0))
     {
         free(filesys->bitmap);
         free(filesys);
@@ -180,12 +180,9 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     }
 
     // prepare root directory inode
-    inode_t root_inode = {
-        .file_type = TYPE_DIR,
-        .file_size = 0,
-        .indirect_ptr = NULL,
-        .direct_ptr = {0},
-        .file_name = {0}};
+    inode_t root_inode;
+    zero((void *)&root_inode, sizeof(root_inode));
+    root_inode.file_type = TYPE_DIR;
 
     // write root inode to first inode block
     uint8_t buf[BLOCK_SIZE];
@@ -211,7 +208,7 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
         }
     }
 
-    // create initial
+    // create initial bitmap
     filesys->bitmap = mkbitmap(filesys, true);
     if (!filesys->bitmap)
     {

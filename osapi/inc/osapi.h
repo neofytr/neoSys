@@ -4,6 +4,7 @@
 #include <base.h>
 #include <sys.h>
 #include <stdint.h>
+#include <disk.h>
 
 // maximum number of file descriptors supported by neosys
 #define MAX_FD (1U << 8)
@@ -53,5 +54,9 @@ internal bool copy(void *dest, void *source, uint16_t bytes);
 // if the final string would exceed 256 chars, the lower digits
 // of 'num' are truncated to fit within the limit
 internal uint8_t *strnum(uint8_t *str, uint8_t num);
+
+internal uint16_t openfiles(drive_t *drive);
+
+internal void erase_all_files(drive_t *drive);
 
 #endif

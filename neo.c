@@ -9,7 +9,7 @@
 #define SYS "syscalls/"
 #define DISK "disk_emulator/"
 #define OSAPI "osapi/"
-#define FILESYS "filesystem/"
+#define FILESYS "file_system/"
 #define COMMON "common/"
 #define INC "inc/"
 #define BIN "bin/"
