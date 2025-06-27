@@ -29,7 +29,7 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     }
 
     // allocate filesystem structure
-    if (!(filesys = (filesys_t *)malloc(sizeof(filesys_t))))
+    if (!(filesys = (filesys_t *)malloc(sizeof(filesys))))
         return NULL;
 
     // calculate inode blocks (10% of total, rounded up)
@@ -68,12 +68,12 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     root_inode.file_size = 0;
     root_inode.file_type = TYPE_DIR;
     root_inode.indirect_ptr = NULL;
-    root_inode.direct_ptr = {0};
-    root_inode.file_name = {0};
+    zero((void *)&root_inode.direct_ptr, sizeof(root_inode.direct_ptr));
+    zero((void *)&root_inode.file_name, sizeof(root_inode.file_name));
 
     // write root inode to the first inode block (2nd overall block)
     zero((void *)buf, BLOCK_SIZE);
-    copy((void *)buf, (void *)root_inode, sizeof(inode_t));
+    copy((void *)buf, (void *)root_inode, sizeof(root_inode));
     if (!d_write(drive, buf, 1))
     {
         free(filesys);
@@ -91,7 +91,7 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
         }
     }
 
-    // zero all the other data blocks
+    // zero all the other remaining blocks
     for (uint16_t index = inode_blocks + 1, index < blocks; index++)
     {
         if (!d_write(drive, buf, index))
