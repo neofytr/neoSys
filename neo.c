@@ -9,17 +9,19 @@
 #define SYS "syscalls/"
 #define DISK "disk_emulator/"
 #define OSAPI "osapi/"
+#define FILESYS "filesystem/"
 #define COMMON "common/"
 #define INC "inc/"
 #define BIN "bin/"
 
 #define SO_FLAGS "-ldl -shared" // create a shared library, with support for dynamic loading
 
-#define CFLAGS "-O2 -Wall -fPIC" \
-               " -I " SYS INC    \
-               " -I " SHELL INC  \
-               " -I " OSAPI INC  \
-               " -I " DISK INC   \
+#define CFLAGS "-O2 -Wall -fPIC"  \
+               " -I " SYS INC     \
+               " -I " SHELL INC   \
+               " -I " OSAPI INC   \
+               " -I " DISK INC    \
+               " -I " FILESYS INC \
                " -I " COMMON
 #define LFLAGS NULL
 
@@ -69,6 +71,12 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+    ret = neo_compile_to_object_file(GCC, FILESYS SRC "filesys.c", NULL, CFLAGS, false);
+    if (!ret)
+    {
+        return EXIT_FAILURE;
+    }
+
     // now we make it a shared library
     neocmd_t *cmd = neocmd_create(BASH);
     if (!cmd)
@@ -81,6 +89,7 @@ int main(int argc, char **argv)
     neocmd_append(cmd, SYS SRC "sys.o");
     neocmd_append(cmd, DISK SRC "disk.o");
     neocmd_append(cmd, OSAPI SRC "osapi.o");
+    neocmd_append(cmd, FILESYS SRC "filesys.o");
 
     neocmd_run_sync(cmd, NULL, NULL, false);
     neocmd_delete(cmd);
