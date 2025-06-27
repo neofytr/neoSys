@@ -3,11 +3,6 @@
 #include <errnum.h>
 #include <stdlib.h>
 
-#include <filesys.h>
-#include <osapi.h>
-#include <errnum.h>
-#include <stdlib.h>
-
 internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force)
 {
     filesys_t *filesys;

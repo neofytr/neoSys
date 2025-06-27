@@ -6,7 +6,7 @@
 #include <disk.h>
 
 /*
- * simple filesystem structure overview:
+ * filesystem structure overview:
  *
  * block 0: superblock (contains metadata about the entire filesystem)
  * block 1 to n: inode blocks (each block contains 16 inodes, 32 bytes each)
