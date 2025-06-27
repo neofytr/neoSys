@@ -34,19 +34,22 @@
 #define PTR_PER_INODE (8)     // direct data block pointers per inode
 #define PTR_PER_BLOCK (256)   // indirect pointers per block (512 bytes / 2 bytes per pointer)
 
+// bootsec_t is an alias for the type uint8_t[BOOT_SECTOR_SIZE], i.e, an array of BOOT_SECTOR_SIZE bytes
+typedef uint8_t bootsec_t[BOOT_SECTOR_SIZE];
+
 /*
  * superblock: the first block (block 0) of the filesystem
  * contains all metadata needed to understand the filesystem layout
  */
 typedef internal struct
 {
-    uint8_t boot_sector[BOOT_SECTOR_SIZE]; // space for bootloader code
-    uint16_t reserved;                     // padding/future use
-    uint16_t blocks;                       // total blocks in filesystem
-    uint16_t inode_blocks;                 // how many blocks are used for inodes
-    uint16_t inodes;                       // total number of inodes available
-    uint16_t magic1;                       // filesystem signature part 1
-    uint16_t magic2;                       // filesystem signature part 2
+    bootsec_t boot_sector; // space for bootloader code
+    uint16_t reserved;     // padding/future use
+    uint16_t blocks;       // total blocks in filesystem
+    uint16_t inode_blocks; // how many blocks are used for inodes
+    uint16_t inodes;       // total number of inodes available
+    uint16_t magic1;       // filesystem signature part 1
+    uint16_t magic2;       // filesystem signature part 2
 } superblock_t;
 
 /*
@@ -102,6 +105,8 @@ typedef internal union
     uint8_t *ptr[PTR_PER_BLOCK]; // when block contains indirect pointers
     inode_t inode;               // when block contains inode data (though typically 16 per block)
 } datablock_t;
+
+internal filesys_t fs_format(drive_t *drive, bootsec_t *boot_sector);
 
 #undef FILENAME_LEN
 #undef FILEEXT_LEN
