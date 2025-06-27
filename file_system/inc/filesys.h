@@ -109,6 +109,10 @@ typedef internal union
     inode_t inode;               // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
+internal void set_bit(bitmap_t bitmap, uint16_t block_num);
+internal void clear_bit(bitmap_t bitmap, uint16_t block_num);
+internal bool get_bit(bitmap_t bitmap, uint16_t block_num);
+
 internal filesys_t fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
 internal bitmap_t mkbitmap(drive_t *drive, bool scan); // returns NULL upon failure
 

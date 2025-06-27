@@ -3,6 +3,10 @@
 #include <errnum.h>
 #include <stdlib.h>
 
+private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks);
+private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
+private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
+
 // bitmap helper functions
 internal void set_bit(bitmap_t bitmap, uint16_t block_num)
 {
@@ -100,7 +104,7 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
     return bitmap;
 }
 
-internal uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks)
+private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks)
 {
     // find first free block after reserved area
     for (uint16_t i = 0; i < total_blocks; i++)
@@ -111,7 +115,7 @@ internal uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks)
     return 0; // no free blocks
 }
 
-internal bool mark_block_used(bitmap_t bitmap, uint16_t block_num)
+private bool mark_block_used(bitmap_t bitmap, uint16_t block_num)
 {
     if (get_bit(bitmap, block_num))
         return false; // already used
@@ -119,7 +123,7 @@ internal bool mark_block_used(bitmap_t bitmap, uint16_t block_num)
     return true;
 }
 
-internal void mark_block_free(bitmap_t bitmap, uint16_t block_num)
+private void mark_block_free(bitmap_t bitmap, uint16_t block_num)
 {
     clear_bit(bitmap, block_num);
 }
