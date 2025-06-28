@@ -104,15 +104,15 @@ internal void clrbitmap(bitmap_t bitmap)
     return;
 }
 
+// returns the first found free block on the drive
+// returns 0 if there are not free blocks found on the drive
 private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks)
 {
+    uint16_t index = 0;
     // find first free block after reserved area
-    for (uint16_t i = 0; i < total_blocks; i++)
-    {
-        if (!get_bit(bitmap, i))
-            return i;
-    }
-    return 0; // no free blocks
+    while (index < total_blocks && get_bit(bitmap, index++))
+        ;
+    return (index >= total_blocks) ? 0 : index; // if there are no free blocks, return 0
 }
 
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num)
