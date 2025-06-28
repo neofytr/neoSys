@@ -1,5 +1,4 @@
 #include <filesys.h>
-#include <bitmap.h>
 #include <osapi.h>
 #include <errnum.h>
 #include <stdlib.h>
@@ -26,7 +25,7 @@ internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
     size = (blocks + 7) / 8;
 
     // allocate and zero bitmap
-    bitmap = bitmap_create(size);
+    bitmap = malloc(size);
     if (!bitmap)
         return NULL;
 
@@ -48,7 +47,7 @@ internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
     {
         if (!d_read(drive, (uint8_t *)&buf, blk))
         {
-            bitmap_destroy(bitmap);
+            free(bitmap);
             return NULL;
         }
 
@@ -76,7 +75,7 @@ internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
                 // read indirect block and mark all referenced blocks
                 if (!d_read(drive, (uint8_t *)indirect_buf.data, indirect_ptr))
                 {
-                    bitmap_destroy(bitmap);
+                    free(bitmap);
                     return NULL;
                 }
 
@@ -100,7 +99,7 @@ internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
     if (!bitmap)
         return;
 
-    bitmap_destroy(bitmap);
+    free(bitmap);
     return;
 }
 
