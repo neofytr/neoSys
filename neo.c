@@ -10,6 +10,8 @@
 #define DISK "disk_emulator/"
 #define OSAPI "osapi/"
 #define FILESYS "file_system/"
+#define LIB "lib/"
+#define NEOSTD "neostd/"
 #define COMMON "common/"
 #define INC "inc/"
 #define BIN "bin/"
@@ -22,7 +24,9 @@
                " -I " OSAPI INC   \
                " -I " DISK INC    \
                " -I " FILESYS INC \
-               " -I " COMMON
+               " -I " COMMON      \
+               " -I " LIB NEOSTD INC
+
 #define LFLAGS NULL
 
 int main(int argc, char **argv)
@@ -58,6 +62,10 @@ int main(int argc, char **argv)
     {
         return EXIT_FAILURE;
     }
+
+    ret = neo_compile_to_object_file(GCC, LIB NEOSTD SRC "neostd.c", NULL, CFLAGS, false);
+    if (!ret)
+        return EXIT_FAILURE;
 
     ret = neo_compile_to_object_file(GCC, DISK SRC "disk.c", NULL, CFLAGS, false);
     if (!ret)
@@ -96,6 +104,6 @@ int main(int argc, char **argv)
 
     neo_link(GCC, BIN "shell.neo", "-L " BIN " -los"
                                    " -Wl,-rpath=./bin",
-             false, SHELL SRC "shell.o");
+             false, SHELL SRC "shell.o", LIB NEOSTD SRC "neostd.o");
     return EXIT_SUCCESS;
 }

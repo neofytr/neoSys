@@ -95,7 +95,7 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
     return bitmap;
 }
 
-internal void clrbitmap(bitmap_t bitmap)
+internal void dltbitmap(bitmap_t bitmap)
 {
     if (!bitmap)
         return;

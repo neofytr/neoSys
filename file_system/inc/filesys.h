@@ -98,7 +98,7 @@ typedef struct
     uint16_t direct_ptr[PTR_PER_INODE]; // block numbers of the first 8 data blocks
 } inode_t;
 
-typedef uint8_t *bitmap_t;
+typedef uint8_t *bitmap_t; // any bitmap_t variable is passed as a reference by defaul
 
 /*
  * filesystem descriptor: main structure for mounted filesystem
@@ -125,7 +125,7 @@ typedef union
 } datablock_t;
 
 internal bitmap_t mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
-internal void clrbitmap(bitmap_t bitmap);
+internal void dltbitmap(bitmap_t bitmap);
 
 internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
 
