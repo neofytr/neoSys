@@ -1,4 +1,5 @@
 #include <filesys.h>
+#include <bitmap.h>
 #include <osapi.h>
 #include <errnum.h>
 #include <stdlib.h>
@@ -7,7 +8,7 @@ private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks);
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
 private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
 
-internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
+internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
 {
     uint16_t size, ptr, node, blocknum, indirect_ptr, blocks, blk, inode_blocks;
     bitmap_t bitmap;
@@ -25,10 +26,9 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
     size = (blocks + 7) / 8;
 
     // allocate and zero bitmap
-    bitmap = malloc(size);
+    bitmap = bitmap_create(size);
     if (!bitmap)
         return NULL;
-    zero(bitmap, size);
 
     if (!scan)
         return bitmap;
@@ -48,7 +48,7 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
     {
         if (!d_read(drive, (uint8_t *)&buf, blk))
         {
-            free(bitmap);
+            bitmap_destroy(bitmap);
             return NULL;
         }
 
@@ -76,7 +76,7 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
                 // read indirect block and mark all referenced blocks
                 if (!d_read(drive, (uint8_t *)indirect_buf.data, indirect_ptr))
                 {
-                    free(bitmap);
+                    bitmap_destroy(bitmap);
                     return NULL;
                 }
 
@@ -95,26 +95,13 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
     return bitmap;
 }
 
-internal void dltbitmap(bitmap_t bitmap)
+internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
 {
     if (!bitmap)
         return;
 
-    free(bitmap);
+    bitmap_destroy(bitmap);
     return;
-}
-
-// returns the first found free block on the drive
-// returns 0 if there are not free blocks found on the drive or if bitmap is NULL (invalid bitmap)
-private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks)
-{
-    uint16_t index = 0;
-    if (!bitmap)
-        return 0;
-    // find first free block after reserved area
-    while (index < total_blocks && get_bit(bitmap, index))
-        index++;
-    return (index >= total_blocks) ? 0 : index; // if there are no free blocks, return 0
 }
 
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num)

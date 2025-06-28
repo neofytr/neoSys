@@ -20,6 +20,7 @@
  * this allows files up to: (8 + 256) * 512 = 135,168 bytes (~132kb) per file
  */
 
+// bitmap macros
 #define set_bit(bitmap, blk)                              \
     do                                                    \
     {                                                     \
@@ -124,9 +125,7 @@ typedef union
     inode_t inode[INODES_PER_BLOCK]; // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
-internal bitmap_t mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
-internal void dltbitmap(bitmap_t bitmap);
-
+internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
+internal void fs_dltbitmap(bitmap_t bitmap);                  // destroys bitmap
 internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
-
 #endif // FILESYS_H

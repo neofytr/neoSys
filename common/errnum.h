@@ -39,8 +39,9 @@ extern public err_t errnum;
 
 #define SUCCESS (0) // errnum will be set to this upon success
 
-#define ErrBadFD (8) // the file descriptor onto which the function is being called is not associated
-                     // with an open file
-#define ErrIO (9)    // unspecified system IO failure
+#define ErrBadFD (8)  // the file descriptor onto which the function is being called is not associated
+                      // with an open file
+#define ErrIO (9)     // unspecified system IO failure
+#define ErrNoMem (10) // not enough memory in the system
 
 #endif
