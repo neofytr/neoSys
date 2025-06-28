@@ -20,14 +20,19 @@
  * this allows files up to: (8 + 256) * 512 = 135,168 bytes (~132kb) per file
  */
 
-// bitmap helper macros
-#define set_bit(bitmap, blk) (bitmap) && \
-                                 (bitmap)[(blk) >> 3U] |= (1U << (((blk) & 7)))
-
-#define clear_bit(bitmap, blk) (bitmap) && \
-                                   (bitmap)[(blk) >> 3U] &= ~(1U << (((blk) & 7)))
-
-#define get_bit(bitmap, blk) (bitmap)[(blk) >> 3U] & (1U << (((blk) & 7)))
+#define set_bit(bitmap, blk)                              \
+    do                                                    \
+    {                                                     \
+        if ((bitmap))                                     \
+            (bitmap)[(blk) >> 3U] |= (1U << ((blk) & 7)); \
+    } while (0)
+#define clear_bit(bitmap, blk)                             \
+    do                                                     \
+    {                                                      \
+        if ((bitmap))                                      \
+            (bitmap)[(blk) >> 3U] &= ~(1U << ((blk) & 7)); \
+    } while (0)
+#define get_bit(bitmap, blk) ((bitmap)[(blk) >> 3U] & (1U << ((blk) & 7)))
 
 // filesystem constants
 #define FILENAME_LEN (8)       // maximum filename length (8.3 format)
@@ -115,7 +120,7 @@ typedef union
 {
     superblock_t superblock;         // when block 0 contains filesystem metadata
     uint8_t data[BLOCK_SIZE];        // when block contains raw file data
-    uint8_t *ptr[PTR_PER_BLOCK];     // when block contains indirect pointers
+    uint16_t ptr[PTR_PER_BLOCK];     // when block contains indirect pointers
     inode_t inode[INODES_PER_BLOCK]; // when block contains inode data (though typically 16 per block)
 } datablock_t;
 

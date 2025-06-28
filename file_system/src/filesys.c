@@ -22,7 +22,7 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
     // calculate bitmap size in bytes (1 bit per block, rounded up)
     drive = filesys->drive;
     blocks = drive->blocks;
-    size = (blocks) + 7) / 8;
+    size = (blocks + 7) / 8;
 
     // allocate and zero bitmap
     bitmap = malloc(size);
@@ -74,17 +74,17 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
                 set_bit(bitmap, indirect_ptr);
 
                 // read indirect block and mark all referenced blocks
-                if (!d_read(drive, (uint8_t *)indirect_buf, indirect_ptr))
+                if (!d_read(drive, (uint8_t *)indirect_buf.data, indirect_ptr))
                 {
                     free(bitmap);
                     return NULL;
                 }
 
                 // parse indirect block as array of block numbers
-                block_ptrs = (uint16_t *)indirect_buf;
+                block_ptr = (uint16_t *)indirect_buf.ptr;
                 for (ptr = 0; ptr < PTR_PER_BLOCK; ptr++)
                 {
-                    blocknum = block_ptrs[ptr];
+                    blocknum = block_ptr[ptr];
                     if (blocknum)
                         set_bit(bitmap, blocknum);
                 }
@@ -105,13 +105,15 @@ internal void clrbitmap(bitmap_t bitmap)
 }
 
 // returns the first found free block on the drive
-// returns 0 if there are not free blocks found on the drive
+// returns 0 if there are not free blocks found on the drive or if bitmap is NULL (invalid bitmap)
 private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks)
 {
     uint16_t index = 0;
+    if (!bitmap)
+        return 0;
     // find first free block after reserved area
-    while (index < total_blocks && get_bit(bitmap, index++))
-        ;
+    while (index < total_blocks && get_bit(bitmap, index))
+        index++;
     return (index >= total_blocks) ? 0 : index; // if there are no free blocks, return 0
 }
 
