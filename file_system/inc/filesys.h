@@ -20,6 +20,15 @@
  * this allows files up to: (8 + 256) * 512 = 135,168 bytes (~132kb) per file
  */
 
+// bitmap helper macros
+#define set_bit(bitmap, blk) (bitmap) && \
+                                 (bitmap)[(blk) >> 3U] |= (1U << (((blk) & 7) - 1))
+
+#define clear_bit(bitmap, blk) (bitmap) && \
+                                   (bitmap)[(blk) >> 3U] &= ~(1U << (((blk) & 7) - 1))
+
+#define get_bit(bitmap, blk) (bitmap)[(blk) >> 3U] & (1U << (((blk) & 7) - 1))
+
 // filesystem constants
 #define FILENAME_LEN (8)       // maximum filename length (8.3 format)
 #define FILEEXT_LEN (3)        // maximum file extension length
@@ -110,11 +119,9 @@ typedef union
     inode_t inode;               // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
-void set_bit(bitmap_t bitmap, uint16_t block_num);
-void clear_bit(bitmap_t bitmap, uint16_t block_num);
-bool get_bit(bitmap_t bitmap, uint16_t block_num);
+internal bitmap_t mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
+internal void clrbitmap(bitmap_t bitmap);
 
-filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
-bitmap_t mkbitmap(filesys_t *drive, bool scan); // returns NULL upon failure
+internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
 
 #endif // FILESYS_H

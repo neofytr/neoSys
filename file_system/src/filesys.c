@@ -104,6 +104,15 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
     return bitmap;
 }
 
+internal void clrbitmap(bitmap_t bitmap)
+{
+    if (!bitmap)
+        return;
+
+    free(bitmap);
+    return;
+}
+
 private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks)
 {
     // find first free block after reserved area
