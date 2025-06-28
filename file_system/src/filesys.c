@@ -9,14 +9,23 @@ private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
 
 internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
 {
+    uint16_t size, ptr, node, blocknum, indirect_ptr, blocks, blk, inode_blocks;
+    bitmap_t bitmap;
+    datablock_t buf, indirect_buf;
+    drive_t *drive;
+    uint16_t *block_ptr;
+    inode_t *inode;
+
     if (!filesys)
         return NULL;
 
     // calculate bitmap size in bytes (1 bit per block, rounded up)
-    uint16_t size = (filesys->drive->blocks + 7) / 8;
+    drive = filesys->drive;
+    blocks = drive->blocks;
+    size = (blocks) + 7) / 8;
 
     // allocate and zero bitmap
-    bitmap_t bitmap = malloc(size);
+    bitmap = malloc(size);
     if (!bitmap)
         return NULL;
     zero(bitmap, size);
@@ -25,61 +34,59 @@ internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
         return bitmap;
 
     // mark superblock and all inode blocks as used
-    for (uint16_t blk = 0; blk <= filesys->super_block.inode_blocks; blk++)
-    {
+
+    inode_blocks = filesys->super_block.inode_blocks;
+    for (blk = 0; blk <= inode_blocks; blk++)
         set_bit(bitmap, blk);
-    }
+
+    // if a blockptr in an inode is zero, that means it's uninitialized since
+    // we set everything to zero by default;
+    // also, 0 is the blockptr for the superblock
 
     // scan all inodes to mark used data blocks
-    uint8_t buf[BLOCK_SIZE];
-    for (uint16_t blk = 1; blk <= filesys->super_block.inode_blocks; blk++)
+    for (blk = 1; blk <= inode_blocks; blk++)
     {
-        if (!d_read(filesys->drive, buf, blk))
+        if (!d_read(drive, (uint8_t *)&buf, blk))
         {
             free(bitmap);
             return NULL;
         }
 
         // check each inode in this block
-        for (uint16_t node = 0; node < INODES_PER_BLOCK; node++)
+        for (node = 0; node < INODES_PER_BLOCK; node++)
         {
-            inode_t *inode = (inode_t *)buf + node;
+            inode = &(buf.inode[node]);
             if (inode->file_type == TYPE_NOT_VALID)
                 continue;
 
             // mark direct pointers as used (assuming they store block numbers directly)
-            for (uint16_t ptr = 0; ptr < PTR_PER_INODE; ptr++)
+            for (ptr = 0; ptr < PTR_PER_INODE; ptr++)
             {
-                uint16_t blocknum = (uint16_t)(uintptr_t)inode->direct_ptr[ptr];
+                blocknum = (uint16_t)inode->direct_ptr[ptr];
                 if (blocknum)
-                {
                     set_bit(bitmap, blocknum);
-                }
             }
 
             // mark indirect block and its pointers as used
-            uint16_t indirect_ptr = (uint16_t)(uintptr_t)inode->indirect_ptr;
+            indirect_ptr = (uint16_t)inode->indirect_ptr;
             if (indirect_ptr)
             {
                 set_bit(bitmap, indirect_ptr);
 
                 // read indirect block and mark all referenced blocks
-                uint8_t indirect_buf[BLOCK_SIZE];
-                if (!d_read(filesys->drive, indirect_buf, indirect_ptr))
+                if (!d_read(drive, (uint8_t *)indirect_buf, indirect_ptr))
                 {
                     free(bitmap);
                     return NULL;
                 }
 
                 // parse indirect block as array of block numbers
-                uint16_t *block_ptrs = (uint16_t *)indirect_buf;
-                for (uint16_t ptr = 0; ptr < PTR_PER_BLOCK; ptr++)
+                block_ptrs = (uint16_t *)indirect_buf;
+                for (ptr = 0; ptr < PTR_PER_BLOCK; ptr++)
                 {
-                    uint16_t blocknum = block_ptrs[ptr];
+                    blocknum = block_ptrs[ptr];
                     if (blocknum)
-                    {
                         set_bit(bitmap, blocknum);
-                    }
                 }
             }
         }

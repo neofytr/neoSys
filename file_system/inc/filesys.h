@@ -113,10 +113,10 @@ typedef struct
  */
 typedef union
 {
-    superblock_t superblock;     // when block 0 contains filesystem metadata
-    uint8_t data[BLOCK_SIZE];    // when block contains raw file data
-    uint8_t *ptr[PTR_PER_BLOCK]; // when block contains indirect pointers
-    inode_t inode;               // when block contains inode data (though typically 16 per block)
+    superblock_t superblock;         // when block 0 contains filesystem metadata
+    uint8_t data[BLOCK_SIZE];        // when block contains raw file data
+    uint8_t *ptr[PTR_PER_BLOCK];     // when block contains indirect pointers
+    inode_t inode[INODES_PER_BLOCK]; // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
 internal bitmap_t mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
