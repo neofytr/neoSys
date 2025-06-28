@@ -22,12 +22,12 @@
 
 // bitmap helper macros
 #define set_bit(bitmap, blk) (bitmap) && \
-                                 (bitmap)[(blk) >> 3U] |= (1U << (((blk) & 7) - 1))
+                                 (bitmap)[(blk) >> 3U] |= (1U << (((blk) & 7)))
 
 #define clear_bit(bitmap, blk) (bitmap) && \
-                                   (bitmap)[(blk) >> 3U] &= ~(1U << (((blk) & 7) - 1))
+                                   (bitmap)[(blk) >> 3U] &= ~(1U << (((blk) & 7)))
 
-#define get_bit(bitmap, blk) (bitmap)[(blk) >> 3U] & (1U << (((blk) & 7) - 1))
+#define get_bit(bitmap, blk) (bitmap)[(blk) >> 3U] & (1U << (((blk) & 7)))
 
 // filesystem constants
 #define FILENAME_LEN (8)       // maximum filename length (8.3 format)
