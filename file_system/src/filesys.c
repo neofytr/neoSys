@@ -103,6 +103,30 @@ internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
     return;
 }
 
+// returns 0 either when filesys is NULL or when no free block found on the drive
+internal uint16_t fs_first_free(filesys_t *filesys)
+{
+    bitmap_t bitmap;
+    uint16_t index, size;
+    drive_t *drive;
+
+    if (!filesys)
+        return 0;
+
+    bitmap = filesys->bitmap;
+    if (!bitmap)
+        return 0;
+
+    drive = filesys->drive;
+    size = drive->blocks; // total number of blocks in the drive (filesystem)
+
+    index = 0;
+    while (index < size && get_bit(bitmap, index))
+        index++;
+
+    return (index >= size) ? (0 : index); // return 0 when no free block found
+}
+
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num)
 {
     if (get_bit(bitmap, block_num))
