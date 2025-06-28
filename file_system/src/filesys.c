@@ -200,7 +200,7 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     zero(buf, BLOCK_SIZE);
     for (uint16_t i = 2; i <= inode_blocks; i++)
     {
-        if (!d_write(drive, buf, i))
+        if (!d_write(drive, buf, i)) // zeroing a inode makes it of type TYPE_NOT_VALID, which is what we want
         {
             free(filesys->bitmap);
             free(filesys);
