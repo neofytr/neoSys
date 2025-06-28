@@ -7,22 +7,6 @@ private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks);
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
 private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
 
-// bitmap helper functions
-internal void set_bit(bitmap_t bitmap, uint16_t block_num)
-{
-    bitmap[block_num / 8] |= (1 << (block_num % 8));
-}
-
-internal void clear_bit(bitmap_t bitmap, uint16_t block_num)
-{
-    bitmap[block_num / 8] &= ~(1 << (block_num % 8));
-}
-
-internal bool get_bit(bitmap_t bitmap, uint16_t block_num)
-{
-    return (bitmap[block_num / 8] & (1 << (block_num % 8))) != 0;
-}
-
 internal bitmap_t mkbitmap(filesys_t *filesys, bool scan)
 {
     if (!filesys)
