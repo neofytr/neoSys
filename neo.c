@@ -20,6 +20,10 @@
 
 #define SO_FLAGS "-ldl -shared" // create a shared library, with support for dynamic loading
 
+#define CHECK_AND_RETURN(ret) \
+    if (!ret)                 \
+        return EXIT_FAILURE;
+
 #define CFLAGS "-O2 -Wall -fPIC"  \
                " -I " SYS INC     \
                " -I " SHELL INC   \
@@ -44,7 +48,7 @@ int main(int argc, char **argv)
         neocmd_append(rm, "rm -rf");
         neocmd_append(rm, DISK SRC "disk.o");
         neocmd_append(rm, SHELL SRC "shell.o");
-        neocmd_append(rm, SYS SRC "sys.o");
+        neocmd_append(rm, SYS SRC "syscalls.o");
         neocmd_append(rm, OSAPI SRC "osapi.o");
         neocmd_append(rm, BIN "libos.so shell.neo");
         neocmd_append(rm, UTILS DISKUTIL SRC "diskutil.o");
@@ -56,49 +60,30 @@ int main(int argc, char **argv)
     }
 
     ret = neo_compile_to_object_file(GCC, SHELL SRC "shell.c", NULL, CFLAGS, false);
-    if (!ret)
-    {
-        return EXIT_FAILURE;
-    }
+    CHECK_AND_RETURN(ret);
 
-    ret = neo_compile_to_object_file(GCC, SYS SRC "sys.c", NULL, CFLAGS, false);
-    if (!ret)
-    {
-        return EXIT_FAILURE;
-    }
+    ret = neo_compile_to_object_file(GCC, SYS SRC "syscalls.c", NULL, CFLAGS, false);
+    CHECK_AND_RETURN(ret);
 
     ret = neo_compile_to_object_file(GCC, LIB NEOSTD SRC "neostd.c", NULL, CFLAGS, false);
-    if (!ret)
-        return EXIT_FAILURE;
+    CHECK_AND_RETURN(ret);
 
     ret = neo_compile_to_object_file(GCC, DISK SRC "disk.c", NULL, CFLAGS, false);
-    if (!ret)
-    {
-        return EXIT_FAILURE;
-    }
+    CHECK_AND_RETURN(ret);
 
     ret = neo_compile_to_object_file(GCC, OSAPI SRC "osapi.c", NULL, CFLAGS, false);
-    if (!ret)
-    {
-        return EXIT_FAILURE;
-    }
+    CHECK_AND_RETURN(ret);
 
     ret = neo_compile_to_object_file(GCC, FILESYS SRC "filesys.c", NULL, CFLAGS, false);
-    if (!ret)
-    {
-        return EXIT_FAILURE;
-    }
+    CHECK_AND_RETURN(ret);
 
-    // now we make it a shared library
+    // now we make all the kernel stuff into a shared library
     neocmd_t *cmd = neocmd_create(BASH);
-    if (!cmd)
-    {
-        return EXIT_FAILURE;
-    }
+    CHECK_AND_RETURN(cmd);
 
     neocmd_append(cmd, "gcc", "-o bin/libos.so");
     neocmd_append(cmd, SO_FLAGS);
-    neocmd_append(cmd, SYS SRC "sys.o");
+    neocmd_append(cmd, SYS SRC "syscalls.o");
     neocmd_append(cmd, DISK SRC "disk.o");
     neocmd_append(cmd, OSAPI SRC "osapi.o");
     neocmd_append(cmd, FILESYS SRC "filesys.o");
@@ -111,9 +96,10 @@ int main(int argc, char **argv)
              false, SHELL SRC "shell.o", LIB NEOSTD SRC "neostd.o");
 
     // compiling and linking the disk utility
-    neo_compile_to_object_file(GCC, UTILS DISKUTIL SRC "diskutil.c", NULL, CFLAGS, false);
+    // neo_compile_to_object_file(GCC, UTILS DISKUTIL SRC "diskutil.c", NULL, CFLAGS, false);
 
     // the disk utility needs some internal kernel headers and functions to link with it
-    neo_link(GCC, UTILS DISKUTIL BIN "diskutil.neo", NULL, false, UTILS DISKUTIL SRC "diskutil.o", OSAPI SRC "osapi.o", DISK SRC "disk.o", FILESYS SRC "filesys.o");
+    // so that it can do it's work properly
+    // neo_link(GCC, UTILS DISKUTIL BIN "diskutil.neo", NULL, false, UTILS DISKUTIL SRC "diskutil.o", OSAPI SRC "osapi.o", DISK SRC "disk.o", FILESYS SRC "filesys.o");
     return EXIT_SUCCESS;
 }

@@ -50,7 +50,14 @@
         "system_error": "c",
         "typeinfo": "c",
         "initializer_list": "c",
-        "bitmap.h": "c"
+        "bitmap.h": "c",
+        "disk.h": "c",
+        "osapi.h": "c",
+        "string.h": "c",
+        "filesys.h": "c",
+        "stdbool.h": "c",
+        "sys.h": "c",
+        "stat.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

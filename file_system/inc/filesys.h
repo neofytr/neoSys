@@ -125,9 +125,9 @@ typedef union
     inode_t inode[INODES_PER_BLOCK]; // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
-internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
-internal void fs_dltbitmap(bitmap_t bitmap);                  // destroys bitmap
-internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
-internal uint16_t fs_first_free(filesys_t *filesys); // returns the blocknum of the first free block in the filesystem; returns 0 on error
+bitmap_t internal fs_mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
+void internal fs_dltbitmap(bitmap_t bitmap);                  // destroys bitmap
+filesys_t *internal fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);
+uint16_t internal fs_first_free(filesys_t *filesys); // returns the blocknum of the first free block in the filesystem; returns 0 on error
 
 #endif // FILESYS_H

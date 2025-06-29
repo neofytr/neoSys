@@ -3,11 +3,11 @@
 #include <errnum.h>
 #include <stdlib.h>
 
-private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks);
-private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
-private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
+uint16_t private find_free_block(bitmap_t bitmap, uint16_t total_blocks);
+bool private mark_block_used(bitmap_t bitmap, uint16_t block_num);
+void private mark_block_free(bitmap_t bitmap, uint16_t block_num);
 
-internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
+bitmap_t internal fs_mkbitmap(filesys_t *filesys, bool scan)
 {
     uint16_t size, ptr, node, blocknum, indirect_ptr, blocks, blk, inode_blocks;
     bitmap_t bitmap;
@@ -94,7 +94,7 @@ internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
     return bitmap;
 }
 
-internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
+void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
 {
     if (!bitmap)
         return;
@@ -104,7 +104,7 @@ internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
 }
 
 // returns 0 either when filesys is NULL or when no free block found on the drive
-internal uint16_t fs_first_free(filesys_t *filesys)
+uint16_t internal fs_first_free(filesys_t *filesys)
 {
     bitmap_t bitmap;
     uint16_t index, size;
@@ -127,7 +127,7 @@ internal uint16_t fs_first_free(filesys_t *filesys)
     return (index >= size) ? (0 : index); // return 0 when no free block found
 }
 
-private bool mark_block_used(bitmap_t bitmap, uint16_t block_num)
+bool private mark_block_used(bitmap_t bitmap, uint16_t block_num)
 {
     if (get_bit(bitmap, block_num))
         return false; // already used
@@ -135,12 +135,12 @@ private bool mark_block_used(bitmap_t bitmap, uint16_t block_num)
     return true;
 }
 
-private void mark_block_free(bitmap_t bitmap, uint16_t block_num)
+void private mark_block_free(bitmap_t bitmap, uint16_t block_num)
 {
     clear_bit(bitmap, block_num);
 }
 
-internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force)
+filesys_t *internal fs_format(drive_t *drive, bootsec_t *boot_sector, bool force)
 {
     if (!drive)
         return NULL;

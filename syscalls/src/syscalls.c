@@ -1,6 +1,6 @@
 #define INSIDE_SYS
 
-#include <sys.h>
+#include <syscalls.h>
 #include <osapi.h>
 #include <stdbool.h>
 #include <errnum.h>

@@ -11,35 +11,9 @@
 // a bit-wise flag to see if a drive is attached or not
 // if drive C is attached, it will have it's LSB set
 // if drive D is attached, it will have it's 2nd LSB set and so on
-internal uint8_t attached = 0;
+uint8_t private attached = 0;
 
-public void test()
-{
-    drive_t *drive = d_attach(DriveC);
-    d_show(drive);
-
-    uint8_t buf[BLOCK_SIZE] = {
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-    };
-    d_write(drive, buf, 12);
-
-    uint8_t dst[BLOCK_SIZE];
-    d_read(drive, dst, 12);
-
-    for (int index = 0; index < 10; index++)
-    {
-        printf("%d\n", dst[index]);
-    }
-
-    return;
-}
-
-internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
+bool internal d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
 {
     if (!drive || !dest)
     {
@@ -59,7 +33,7 @@ internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
     return true;
 }
 
-internal bool d_write(drive_t *drive, uint8_t *src, uint16_t block_num)
+bool internal d_write(drive_t *drive, uint8_t *src, uint16_t block_num)
 {
     if (!drive || !src)
     {
@@ -79,7 +53,7 @@ internal bool d_write(drive_t *drive, uint8_t *src, uint16_t block_num)
     return true;
 }
 
-internal void d_show(drive_t *drive)
+void internal d_show(drive_t *drive)
 {
     if (!drive)
     {
@@ -95,7 +69,7 @@ internal void d_show(drive_t *drive)
     return;
 }
 
-internal bool d_detach(drive_t *drive)
+bool internal d_detach(drive_t *drive)
 {
     if (!drive)
     {
@@ -109,7 +83,7 @@ internal bool d_detach(drive_t *drive)
     return true;
 }
 
-internal drive_t *d_attach(uint8_t drive_num)
+drive_t * interal d_attach(uint8_t drive_num)
 {
     drive_t *drive;
     uint8_t *file;

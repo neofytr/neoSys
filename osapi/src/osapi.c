@@ -1,6 +1,6 @@
 #include <osapi.h>
 
-internal bool set(void *mem, uint16_t n, uint8_t c)
+bool internal set(void *mem, uint16_t n, uint8_t c)
 {
     if (!mem)
     {
@@ -15,7 +15,7 @@ internal bool set(void *mem, uint16_t n, uint8_t c)
     return true;
 }
 
-internal uint16_t stringlen(void *str)
+uint16_t internal stringlen(void *str)
 {
     if (!str)
     {
@@ -31,7 +31,7 @@ internal uint16_t stringlen(void *str)
     return len;
 }
 
-internal uint8_t *strnum(uint8_t *str, uint8_t num)
+uint8_t *internal strnum(uint8_t *str, uint8_t num)
 {
     if (!str)
     {
@@ -88,7 +88,7 @@ internal uint8_t *strnum(uint8_t *str, uint8_t num)
     return buf;
 }
 
-internal bool copy(void *dst, void *src, uint16_t n)
+bool internal copy(void *dst, void *src, uint16_t n)
 {
     if (!dst || !src || !n)
     {
@@ -112,7 +112,7 @@ internal bool copy(void *dst, void *src, uint16_t n)
     return true;
 }
 
-internal bool zero(void *mem, uint16_t bytes)
+bool internal zero(void *mem, uint16_t bytes)
 {
     if (!mem)
     {
@@ -128,12 +128,12 @@ internal bool zero(void *mem, uint16_t bytes)
     return true;
 }
 
-internal uint16_t openfiles(drive_t *drive)
+uint16_t internal openfiles(drive_t *drive)
 {
     return 0;
 }
 
-internal void erase_all_files(drive_t *drive)
+void internal erase_all_files(drive_t *drive)
 {
     return;
 }
