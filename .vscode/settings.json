@@ -57,7 +57,8 @@
         "filesys.h": "c",
         "stdbool.h": "c",
         "sys.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "syscalls.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

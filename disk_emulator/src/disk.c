@@ -83,7 +83,7 @@ bool internal d_detach(drive_t *drive)
     return true;
 }
 
-drive_t * interal d_attach(uint8_t drive_num)
+drive_t *interal d_attach(uint8_t drive_num)
 {
     drive_t *drive;
     uint8_t *file;

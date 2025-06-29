@@ -1,6 +1,6 @@
 #include <osapi.h>
 
-bool internal set(void *mem, uint16_t n, uint8_t c)
+internal bool set(void *mem, uint16_t n, uint8_t c)
 {
     if (!mem)
     {
@@ -15,7 +15,7 @@ bool internal set(void *mem, uint16_t n, uint8_t c)
     return true;
 }
 
-uint16_t internal stringlen(void *str)
+internal uint16_t stringlen(void *str)
 {
     if (!str)
     {
@@ -31,7 +31,7 @@ uint16_t internal stringlen(void *str)
     return len;
 }
 
-uint8_t *internal strnum(uint8_t *str, uint8_t num)
+internal uint8_t *strnum(uint8_t *str, uint8_t num)
 {
     if (!str)
     {
@@ -54,7 +54,7 @@ uint8_t *internal strnum(uint8_t *str, uint8_t num)
 
     // convert number to decimal digits and append
     // handle special case of 0
-    if (num == 0)
+    if (!num && len)
     {
         if (len < 255) // ensure space for digit and null terminator
         {
@@ -88,7 +88,7 @@ uint8_t *internal strnum(uint8_t *str, uint8_t num)
     return buf;
 }
 
-bool internal copy(void *dst, void *src, uint16_t n)
+internal bool copy(void *dst, void *src, uint16_t n)
 {
     if (!dst || !src || !n)
     {
@@ -112,7 +112,7 @@ bool internal copy(void *dst, void *src, uint16_t n)
     return true;
 }
 
-bool internal zero(void *mem, uint16_t bytes)
+internal bool zero(void *mem, uint16_t bytes)
 {
     if (!mem)
     {
@@ -128,12 +128,12 @@ bool internal zero(void *mem, uint16_t bytes)
     return true;
 }
 
-uint16_t internal openfiles(drive_t *drive)
+internal uint16_t openfiles(drive_t *drive)
 {
     return 0;
 }
 
-void internal erase_all_files(drive_t *drive)
+internal void erase_all_files(drive_t *drive)
 {
     return;
 }

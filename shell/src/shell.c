@@ -1,7 +1,6 @@
 #include <shell.h>
-#include <sys.h>
+#include <syscalls.h>
 #include <disk.h>
-#include <stdio.h>
 #include <errnum.h>
 
 int main()
