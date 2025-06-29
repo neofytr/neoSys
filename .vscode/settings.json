@@ -59,7 +59,8 @@
         "sys.h": "c",
         "stat.h": "c",
         "syscalls.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "cinttypes": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
