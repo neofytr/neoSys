@@ -18,5 +18,9 @@ public
 uint8_t load(const fd_t file); // read one byte from the file descriptor file_desc
 public
 bool store(const fd_t file, const uint8_t chr); // store the byte data into the file descriptor file_desc
+public
+bool isopen(const fd_t file) // checks if the neoSys file descriptor file is associated with some open file
+                             // fails with errnum set to ErrBadFD if not
+                             // succeeds otherwise
 
 #endif

@@ -47,6 +47,8 @@ int main(int argc, char **argv)
         neocmd_append(rm, SYS SRC "sys.o");
         neocmd_append(rm, OSAPI SRC "osapi.o");
         neocmd_append(rm, BIN "libos.so shell.neo");
+        neocmd_append(rm, UTILS DISKUTIL SRC "diskutil.o");
+        neocmd_append(rm, UTILS DISKUTIL BIN "diskutil.neo");
 
         neocmd_run_sync(rm, NULL, NULL, false);
         neocmd_delete(rm);
@@ -110,6 +112,8 @@ int main(int argc, char **argv)
 
     // compiling and linking the disk utility
     neo_compile_to_object_file(GCC, UTILS DISKUTIL SRC "diskutil.c", NULL, CFLAGS, false);
-    neo_link(GCC, UTILS DISKUTIL BIN "diskutil", NULL, false, OSAPI SRC "osapi.o");
+
+    // the disk utility needs some internal kernel headers and functions to link with it
+    neo_link(GCC, UTILS DISKUTIL BIN "diskutil.neo", NULL, false, UTILS DISKUTIL SRC "diskutil.o", OSAPI SRC "osapi.o", DISK SRC "disk.o", FILESYS SRC "filesys.o");
     return EXIT_SUCCESS;
 }
