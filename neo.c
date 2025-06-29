@@ -12,6 +12,8 @@
 #define FILESYS "file_system/"
 #define LIB "lib/"
 #define NEOSTD "neostd/"
+#define UTILS "utils/"
+#define DISKUTIL "diskutil/"
 #define COMMON "common/"
 #define INC "inc/"
 #define BIN "bin/"
@@ -105,5 +107,9 @@ int main(int argc, char **argv)
     neo_link(GCC, BIN "shell.neo", "-L " BIN " -los"
                                    " -Wl,-rpath=./bin",
              false, SHELL SRC "shell.o", LIB NEOSTD SRC "neostd.o");
+
+    // compiling and linking the disk utility
+    neo_compile_to_object_file(GCC, UTILS DISKUTIL SRC "diskutil.c", NULL, CFLAGS, false);
+    neo_link(GCC, UTILS DISKUTIL BIN "diskutil", NULL, false, OSAPI SRC "osapi.o");
     return EXIT_SUCCESS;
 }
