@@ -25,7 +25,7 @@ typedef uint8_t fd_t;
 // maps neosys file descriptors to posix file descriptors
 // file_desc_arr[file] holds the posix fd mapped to neosys fd 'file'
 // -1 indicates no mapping exists for that neosys fd
-int internal file_desc_arr[MAX_FD] = {
+internal int file_desc_arr[MAX_FD] = {
     0,  // neosys fd 0 -> posix stdin
     1,  // neosys fd 1 -> posix stdout
     2,  // neosys fd 2 -> posix stderr

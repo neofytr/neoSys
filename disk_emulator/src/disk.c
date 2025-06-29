@@ -11,9 +11,9 @@
 // a bit-wise flag to see if a drive is attached or not
 // if drive C is attached, it will have it's LSB set
 // if drive D is attached, it will have it's 2nd LSB set and so on
-uint8_t private attached = 0;
+private uint8_t attached = 0;
 
-bool internal d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
+internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
 {
     if (!drive || !dest)
     {
@@ -33,7 +33,7 @@ bool internal d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
     return true;
 }
 
-bool internal d_write(drive_t *drive, uint8_t *src, uint16_t block_num)
+internal bool d_write(drive_t *drive, uint8_t *src, uint16_t block_num)
 {
     if (!drive || !src)
     {
@@ -53,7 +53,7 @@ bool internal d_write(drive_t *drive, uint8_t *src, uint16_t block_num)
     return true;
 }
 
-void internal d_show(drive_t *drive)
+internal void d_show(drive_t *drive)
 {
     if (!drive)
     {
@@ -69,7 +69,7 @@ void internal d_show(drive_t *drive)
     return;
 }
 
-bool internal d_detach(drive_t *drive)
+internal bool d_detach(drive_t *drive)
 {
     if (!drive)
     {
@@ -83,7 +83,7 @@ bool internal d_detach(drive_t *drive)
     return true;
 }
 
-drive_t *interal d_attach(uint8_t drive_num)
+internal drive_t *d_attach(uint8_t drive_num)
 {
     drive_t *drive;
     uint8_t *file;

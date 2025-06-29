@@ -96,10 +96,10 @@ int main(int argc, char **argv)
              false, SHELL SRC "shell.o", LIB NEOSTD SRC "neostd.o");
 
     // compiling and linking the disk utility
-    // neo_compile_to_object_file(GCC, UTILS DISKUTIL SRC "diskutil.c", NULL, CFLAGS, false);
+    neo_compile_to_object_file(GCC, UTILS DISKUTIL SRC "diskutil.c", NULL, CFLAGS, false);
 
     // the disk utility needs some internal kernel headers and functions to link with it
     // so that it can do it's work properly
-    // neo_link(GCC, UTILS DISKUTIL BIN "diskutil.neo", NULL, false, UTILS DISKUTIL SRC "diskutil.o", OSAPI SRC "osapi.o", DISK SRC "disk.o", FILESYS SRC "filesys.o");
+    neo_link(GCC, UTILS DISKUTIL BIN "diskutil.neo", NULL, false, UTILS DISKUTIL SRC "diskutil.o", OSAPI SRC "osapi.o", DISK SRC "disk.o", FILESYS SRC "filesys.o");
     return EXIT_SUCCESS;
 }

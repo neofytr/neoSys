@@ -25,7 +25,6 @@ public bool isopen(const fd_t file)
     {
         ret_success; // neoSys fd 0, 1 and 2 are always open as stdin, stdout, and stderr respectively
     } // checks if the given neosys file descriptor points to an open file
-    internal bool isopen(const fd_t file);
 
     // each neoSys fd is currently backed by a posix fd
     // we first check if the neoSys fd file is backed by some posix fd
