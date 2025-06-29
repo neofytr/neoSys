@@ -29,6 +29,10 @@
  * ----------------------------------------------------------------------------
  */
 
+// a variable declared "internal" inside a .o file is only visible
+// to other .o files which are being linked together to the initial .o file
+// also, in the final .so/.o, internal ensures that the initial variable isn't exported
+
 #define public __attribute__((visibility("default")))  // functions/variables exported to the user (shell process) by the kernel
 #define private static                                 // functions/variables private to a translation unit
 #define internal __attribute__((visibility("hidden"))) // functions/variables internal to the kernel shared library object file

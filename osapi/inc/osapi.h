@@ -6,40 +6,8 @@
 #include <stdint.h>
 #include <disk.h>
 
-// maximum number of file descriptors supported by neosys
-#define MAX_FD (1U << 8)
-
-#ifdef INSIDE_SYS
-
-// maps neosys file descriptors to posix file descriptors
-// file_desc_arr[file] holds the posix fd mapped to neosys fd 'file'
-// -1 indicates no mapping exists for that neosys fd
-internal int file_desc_arr[MAX_FD] = {
-    0,  // neosys fd 0 -> posix stdin
-    1,  // neosys fd 1 -> posix stdout
-    2,  // neosys fd 2 -> posix stderr
-    -1, // remaining slots unmapped
-};
-
-#else
-
-extern int *file_desc_arr;
-
-#endif
-
-// standard file descriptor mappings (same as posix):
-// neosys fd 0 -> stdin  (standard input)
-// neosys fd 1 -> stdout (standard output)
-// neosys fd 2 -> stderr (standard error)
-
-// macro to get the posix fd corresponding to a neosys fd
-#define get_posix_fd(x) (file_desc_arr[(x)])
-
 // returns the length of a null-terminated c string
 internal uint16_t stringlen(void *str);
-
-// checks if the given neosys file descriptor points to an open file
-internal bool isopen(const fd_t file);
 
 // zeroes 'bytes' number of bytes starting at memory address 'mem'
 internal bool zero(void *mem, uint16_t bytes);
