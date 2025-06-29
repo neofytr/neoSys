@@ -1,17 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
 
 #include <disk.h>
 #include <filesys.h>
 
-void usage(uint8_t *arg);
-void usage_format(uint8_t *arg);
-void cmd_format(uint8_t *, uint8_t *);
-int main(int argc, uint8_t **argv);
+void usage(char *arg);
+void usage_format(char *arg);
+void cmd_format(char *, char *);
+int main(int argc, char **argv);
 
-void usage(uint8_t *arg)
+void usage(char *arg)
 {
     fprintf(stderr, "Usage: %s <command> [arguments]\n", arg);
     fprintf(stderr, "Available commands:\n"
@@ -20,15 +19,16 @@ void usage(uint8_t *arg)
     exit(EXIT_FAILURE);
 }
 
-void cmd_format(uint8_t *arg1, uint8_t *arg2)
+void cmd_format(char *arg1, char *arg2)
 {
-    uint8_t drive;
-    uint8_t *drive_str;
-    drive_t *drive_desc;
-    filesys_t *filesys;
+    char drive = 0;
+    char *drive_str = NULL;
+    drive_t *drive_desc = NULL;
+    filesys_t *filesys = NULL;
 
-    bool bootable;
-    bool force;
+    bool bootable = false;
+    char force = true;
+    int ret = 0;
 
     if (!arg1)
         usage_format("diskutil");
@@ -39,7 +39,7 @@ void cmd_format(uint8_t *arg1, uint8_t *arg2)
     }
     else
     {
-        if (!strcmp(arg1, "-s"))
+        if (!strcmp((const char *)arg1, "-s"))
         {
             bootable = true;
             drive_str = arg2;
@@ -48,17 +48,20 @@ void cmd_format(uint8_t *arg1, uint8_t *arg2)
             usage_format("diskutil");
     }
 
-    switch (*drive_str)
+    switch (*drive_str) // based on the first character of drive_string
     {
-    case ('c' || 'C'):
+    case 'c':
+    case 'C':
         drive = 1;
         break;
-    case ('D' || 'd'):
+    case 'd':
+    case 'D':
         drive = 2;
         break;
     default:
         usage_format("diskutil");
-    } // based on the first character of drive_string
+        break;
+    }
 
     if (bootable)
     {
@@ -67,26 +70,37 @@ void cmd_format(uint8_t *arg1, uint8_t *arg2)
     }
 
     fprintf(stdout, "This will format and ERASE your drive %s\n", drive_str);
-    fprintf(stdout, "Continue? (y/n)");
-    fflush(stdout);
+    fprintf(stdout, "Continue? (y/n): ");
 
-    scanf("%d\n", &force);
-    force = (force == 'y' || force == 'Y') ? true : false;
+    ret = scanf("%c", &force);
+    if (ret < 1)
+    {
+        fprintf(stderr, "Error reading the choice\n");
+        return;
+    }
+
+    force = (force == 'y' || (char)force == 'Y') ? 0 : 1;
     if (!force)
         return;
 
     fprintf(stdout, "Formatting drive %s\n", drive_str);
     drive_desc = d_attach(drive);
     if (!drive_desc)
-        fprintf(stderr, "Bad drive %s\n", drive_str) && return EXIT_FAILURE;
+    {
+        fprintf(stderr, "Bad drive %s\n", drive_str);
+        return;
+    }
 
     filesys = fs_format(drive_desc, NULL, true);
     if (!filesys)
-        fprintf(stderr, "Error formatting the drive %s\n", drive_str) && return EXIT_FAILURE;
+    {
+        fprintf(stderr, "Error formatting the drive %s\n", drive_str);
+        return;
+    }
 
-    return EXIT_SUCCESS;
+    return;
 }
-void usage_format(uint8_t *arg)
+void usage_format(char *arg)
 {
     fprintf(stderr, "Usage: %s format [-s] <drive>\n", arg);
     fprintf(stderr, "Example:\n");
@@ -95,9 +109,9 @@ void usage_format(uint8_t *arg)
     exit(EXIT_FAILURE);
 }
 
-int main(int argc, uint8_t **argv)
+int main(int argc, char **argv)
 {
-    uint8_t *arg1, *arg2, *cmd;
+    char *arg1 = NULL, *arg2 = NULL, *cmd = NULL;
 
     if (argc < 2)
         usage(argv[0]);

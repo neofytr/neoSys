@@ -60,7 +60,9 @@
         "stat.h": "c",
         "syscalls.h": "c",
         "unistd.h": "c",
-        "cinttypes": "c"
+        "cinttypes": "c",
+        "stdlib.h": "c",
+        "stdint.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
