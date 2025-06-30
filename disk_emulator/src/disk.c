@@ -13,6 +13,19 @@
 // if drive D is attached, it will have it's 2nd LSB set and so on
 private uint8_t attached = 0;
 
+internal char *d_getdrivename(uint8_t drive_num)
+{
+    switch (drive_num)
+    {
+    case DriveC:
+        return "DriveC";
+    case DriveD:
+        return "DriveD";
+    default:
+        return NULL;
+    }
+}
+
 public drive_t *drive_test(uint8_t drive_num)
 {
     if (drive_num != DriveC && drive_num != DriveD)

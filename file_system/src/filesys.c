@@ -154,7 +154,7 @@ internal filesys_t *fs_mount(uint8_t drive_num)
     }
 
     mounted |= drive_num;
-    kprintf("Drive %d mounted", drive_num);
+    kprintf("Drive %s mounted", d_getdrivename(drive_num));
     return filesys;
 }
 
@@ -498,4 +498,21 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     }
 
     return filesys;
+}
+
+internal void fs_unmount(filesys_t *filesys)
+{
+    if (!filesys)
+        return;
+
+    if (!d_is_drivenum_valid(filesys->drive_num))
+        return;
+
+    // free bitmap
+    fs_dltbitmap(filesys->bitmap);
+    d_detach(filesys->drive);
+    free(filesys);
+
+    kprintf("Drive %s unmounted", d_getdrivename(filesys->drive_num));
+    return;
 }
