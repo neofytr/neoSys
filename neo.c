@@ -18,20 +18,27 @@
 #define INC "inc/"
 #define BIN "bin/"
 
+#ifdef DEBUG
+#define DEBUG_FLAGS "-g3"
+#else
+#define DEBUG_FLAGS ""
+#endif
+
 #define SO_FLAGS "-ldl -shared" // create a shared library, with support for dynamic loading
 
 #define CHECK_AND_RETURN(ret) \
     if (!ret)                 \
         return EXIT_FAILURE;
 
-#define CFLAGS "-O2 -Wall -fPIC -g3" \
+#define CFLAGS "-O2 -Wall -fPIC"     \
                " -I " SYS INC        \
                " -I " SHELL INC      \
                " -I " OSAPI INC      \
                " -I " DISK INC       \
                " -I " FILESYS INC    \
                " -I " COMMON         \
-               " -I " LIB NEOSTD INC
+               " -I " LIB NEOSTD INC \
+                   DEBUG_FLAGS
 
 #define LFLAGS NULL
 

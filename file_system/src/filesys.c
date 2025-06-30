@@ -2,6 +2,7 @@
 #include <osapi.h>
 #include <errnum.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks);
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
@@ -9,8 +10,35 @@ private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
 
 public void filesys_test(drive_t *drive)
 {
-    if (!fs_format(drive, NULL, true))
+    filesys_t *filesys = NULL;
+    if (!(filesys = fs_format(drive, NULL, true)))
         return;
+
+    fs_show(filesys, true);
+}
+
+internal bool fs_get_inode(filesys_t *filesys, uint16_t inode_index, inode_t *inode)
+{
+    uint16_t inode_blocks;
+    uint16_t inode_index_in_block;
+    uint16_t inode_block_index;
+    datablock_t inode_block;
+
+    if (!filesys || !inode)
+        return false;
+
+    inode_blocks = filesys->super_block.inode_blocks;
+    inode_block_index = inode_index / INODES_PER_BLOCK;
+    if (inode_block_index >= inode_blocks)
+        return false;
+    inode_block_index++; // inode blocks start at block index 1, after the superblock (block index 0)
+    inode_index_in_block = inode_index % INODES_PER_BLOCK;
+
+    if (!d_read(filesys->drive, (uint8_t *)&inode_block.data, inode_block_index))
+        return false;
+
+    copy((void *)inode, (void *)&inode_block.inode[inode_index_in_block], sizeof(inode_t));
+    return true;
 }
 
 internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
@@ -107,6 +135,64 @@ internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
 
     free(bitmap);
     return;
+}
+
+internal void fs_show(filesys_t *filesys, bool show_bitmap)
+{
+    uint16_t i, j, used_blocks, free_blocks;
+    bitmap_t bitmap;
+
+    if (!filesys)
+        return;
+
+    // print filesystem header
+    printf("filesystem information:\n");
+    printf("======================\n");
+
+    // print superblock info
+    printf("drive number: %d\n", filesys->drive_num);
+    printf("total blocks: %d\n", filesys->super_block.blocks);
+    printf("inode blocks: %d\n", filesys->super_block.inode_blocks);
+    printf("total inodes: %d\n", filesys->super_block.inodes);
+    printf("magic numbers: 0x%04x 0x%04x\n", filesys->super_block.magic1, filesys->super_block.magic2);
+
+    // calculate used/free blocks from bitmap
+    bitmap = filesys->bitmap;
+    used_blocks = 0;
+    free_blocks = 0;
+
+    if (bitmap)
+    {
+        for (i = 0; i < filesys->super_block.blocks; i++)
+        {
+            if (get_bit(bitmap, i))
+                used_blocks++;
+            else
+                free_blocks++;
+        }
+    }
+
+    printf("used blocks: %d\n", used_blocks);
+    printf("free blocks: %d\n", free_blocks);
+
+    // show bitmap if requested
+    if (show_bitmap && bitmap)
+    {
+        printf("\nblock bitmap (0=free, 1=used):\n");
+        printf("==============================\n");
+
+        for (i = 0; i < filesys->super_block.blocks; i += 16)
+        {
+            printf("%04d: ", i);
+            for (j = 0; j < 16 && (i + j) < filesys->super_block.blocks; j++)
+            {
+                printf("%d", get_bit(bitmap, i + j) ? 1 : 0);
+            }
+            printf("\n");
+        }
+    }
+
+    printf("\n");
 }
 
 // returns 0 either when filesys is NULL or when no free block found on the drive
