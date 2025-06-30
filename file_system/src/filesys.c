@@ -154,6 +154,7 @@ internal filesys_t *fs_mount(uint8_t drive_num)
     }
 
     mounted |= drive_num;
+    kprintf("Drive %d mounted", drive_num);
     return filesys;
 }
 
