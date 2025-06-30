@@ -2,6 +2,7 @@
 #include <syscalls.h>
 #include <disk.h>
 #include <errnum.h>
+#include <stdio.h>
 #include <filesys.h>
 #include <disk.h>
 

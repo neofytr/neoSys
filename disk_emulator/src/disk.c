@@ -119,7 +119,7 @@ internal drive_t *d_attach(uint8_t drive_num)
         return NULL;
     }
 
-    file = strnum((uint8_t *)DRIVE_BASE_PATH, drive_num);
+    file = strnum((uint8_t *)DRIVE_BASE_PATH, drive_num); // returns static memory (no need to free)
     if (!file)
     {
         free(drive);

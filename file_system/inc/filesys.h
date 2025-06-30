@@ -88,12 +88,18 @@ typedef struct packed
     uint8_t extension[FILEEXT_LEN]; // extension part (e.g., "txt")
 } filename_t;                       // packed ensures this structure is always 11 bytes
 
-typedef enum
+/* typedef enum
 {
     TYPE_NOT_VALID = 0x00,
     TYPE_FILE = 0x01,
     TYPE_DIR = 0x03,
 } filetype_t;
+ */
+
+// can't have filetype_t
+#define TYPE_NOT_VALID 0x00
+#define TYPE_FILE 0x01
+#define TYPE_DIR 0x03
 
 /*
  * inode: represents a single file or directory
@@ -102,7 +108,7 @@ typedef enum
 typedef struct packed
 {
     // file status and type information packed into single byte
-    filetype_t file_type;
+    uint8_t file_type;
 
     uint16_t file_size;                 // file size in bytes
     filename_t file_name;               // file name and extension

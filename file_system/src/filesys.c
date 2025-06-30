@@ -1,6 +1,7 @@
 #include <filesys.h>
 #include <osapi.h>
 #include <errnum.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -21,6 +22,68 @@ filesys_test(drive_t *drive)
     fs_show(filesys, true);
 }
 
+// function to display memory region in hexdump format
+// takes a void pointer and number of bytes to display
+private void hexdump(void *ptr, size_t num_bytes)
+{
+    if (!ptr || num_bytes == 0)
+    {
+        printf("error: invalid pointer or zero bytes\n");
+        return;
+    }
+
+    uint8_t *data = (uint8_t *)ptr;
+    size_t i, j;
+
+    printf("hexdump of %zu bytes starting at %p:\n", num_bytes, ptr);
+    printf("offset    hex                                         ascii\n");
+    printf("--------  ----------------------------------------------  ----------------\n");
+
+    for (i = 0; i < num_bytes; i += 16)
+    {
+        // print offset
+        printf("%08zx  ", i);
+
+        // print hex bytes (16 per line)
+        for (j = 0; j < 16; j++)
+        {
+            if (i + j < num_bytes)
+            {
+                printf("%02x ", data[i + j]);
+            }
+            else
+            {
+                printf("   "); // padding for incomplete lines
+            }
+
+            // add extra space after 8 bytes for readability
+            if (j == 7)
+            {
+                printf(" ");
+            }
+        }
+
+        printf(" ");
+
+        // print ascii representation
+        for (j = 0; j < 16 && (i + j) < num_bytes; j++)
+        {
+            uint8_t byte = data[i + j];
+            if (isprint(byte))
+            {
+                printf("%c", byte);
+            }
+            else
+            {
+                printf(".");
+            }
+        }
+
+        printf("\n");
+    }
+    printf("\n");
+}
+
 internal bool fs_get_inode(filesys_t *filesys, uint16_t inode_index, inode_t *inode)
 {
     uint16_t inode_blocks;
@@ -38,7 +101,7 @@ internal bool fs_get_inode(filesys_t *filesys, uint16_t inode_index, inode_t *in
     inode_block_index++; // inode blocks start at block index 1, after the superblock (block index 0)
     inode_index_in_block = inode_index % INODES_PER_BLOCK;
 
-    if (!d_read(filesys->drive, (uint8_t *)&inode_block.data, inode_block_index))
+    if (!d_read(filesys->drive, (uint8_t *)inode_block.data, inode_block_index))
         return false;
 
     copy((void *)inode, (void *)&inode_block.inode[inode_index_in_block], sizeof(inode_t));
@@ -67,11 +130,13 @@ internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
     if (!bitmap)
         return NULL;
 
+    // Initialize bitmap to all zeros
+    zero(bitmap, size);
+
     if (!scan)
         return bitmap;
 
     // mark superblock and all inode blocks as used
-
     inode_blocks = filesys->super_block.inode_blocks;
     for (blk = 0; blk <= inode_blocks; blk++)
         set_bit(bitmap, blk);
@@ -142,6 +207,7 @@ internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
 }
 
 // buf should be of atleast 13 bytes
+// FIXED: Corrected name/extension order
 private bool get_file_name(inode_t *inode, uint8_t *buf)
 {
     uint8_t index;
@@ -154,11 +220,23 @@ private bool get_file_name(inode_t *inode, uint8_t *buf)
     ext = inode->file_name.extension;
     name = inode->file_name.name;
 
-    while (index < FILEEXT_LEN && *ext)
-        buf[index++] = *ext++;
-    buf[index++] = '.';
-    while (index < BUF_LEN_FOR_FILENAME && *name)
+    // Handle empty filename
+    if (!*name && !*ext)
+    {
+        buf[0] = 0;
+        return true;
+    }
+
+    while (index < 8 && index < BUF_LEN_FOR_FILENAME - 1 && *name)
         buf[index++] = *name++;
+
+    if (*ext && index < BUF_LEN_FOR_FILENAME - 1)
+    {
+        buf[index++] = '.';
+        while (index < BUF_LEN_FOR_FILENAME - 1 && *ext)
+            buf[index++] = *ext++;
+    }
+
     buf[index] = '\0';
     return true;
 }
@@ -166,7 +244,7 @@ private bool get_file_name(inode_t *inode, uint8_t *buf)
 internal void fs_show(filesys_t *filesys, bool show_bitmap)
 {
     uint16_t i, j, used_blocks, free_blocks;
-    uint16_t total_used_inodes, index;
+    uint16_t total_inodes, index;
     bitmap_t bitmap;
     inode_t inode;
     uint8_t buf[BUF_LEN_FOR_FILENAME];
@@ -190,15 +268,19 @@ internal void fs_show(filesys_t *filesys, bool show_bitmap)
     printf("inode table:\n");
     printf("============\n");
 
-    total_used_inodes = filesys->super_block.inodes;
-    for (index = 0; index < total_used_inodes; index++)
+    total_inodes = filesys->super_block.inodes;
+    for (index = 0; index < total_inodes; index++)
     {
         if (!fs_get_inode(filesys, index, &inode))
-            return;
+            continue;
 
         if (!get_file_name(&inode, buf))
-            return;
-        printf("inode_index %d: type=%d, file_size=%d (bytes), file_name=%s\n", index, inode.file_type, inode.file_size, (char *)buf);
+            continue;
+
+        // only show valid inodes to avoid garbage
+        if (inode.file_type != TYPE_NOT_VALID)
+            printf("inode_index %d: type=%d, file_size=%d (bytes), file_name=%s\n",
+                   index, inode.file_type, inode.file_size, (char *)buf);
     }
 
     printf("\n");
@@ -303,7 +385,8 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     // initialize superblock
     filesys->super_block.magic1 = MAGIC1;
     filesys->super_block.magic2 = MAGIC2;
-    filesys->super_block.inodes = 1;
+
+    filesys->super_block.inodes = inode_blocks * INODES_PER_BLOCK;
     filesys->super_block.blocks = drive->blocks;
     filesys->super_block.inode_blocks = inode_blocks;
     filesys->super_block.reserved = 0;
@@ -325,7 +408,6 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     // write superblock to drive
     if (!d_write(drive, (uint8_t *)&filesys->super_block, 0))
     {
-        free(filesys->bitmap);
         free(filesys);
         return NULL;
     }
@@ -342,7 +424,6 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
 
     if (!d_write(drive, buf, 1))
     {
-        free(filesys->bitmap);
         free(filesys);
         return NULL;
     }
@@ -351,9 +432,8 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
     zero(buf, BLOCK_SIZE);
     for (uint16_t i = 2; i <= inode_blocks; i++)
     {
-        if (!d_write(drive, buf, i)) // zeroing a inode makes it of type TYPE_NOT_VALID, which is what we want
+        if (!d_write(drive, buf, i))
         {
-            free(filesys->bitmap);
             free(filesys);
             return NULL;
         }
