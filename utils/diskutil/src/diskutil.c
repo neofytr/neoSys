@@ -84,7 +84,6 @@ void cmd_format(char *arg1, char *arg2)
         return;
 
     fprintf(stdout, "Formatting drive %s\n", drive_str);
-    fprintf(stdout, "drive: %d\n", drive);
     drive_desc = d_attach(drive);
     if (!drive_desc)
     {

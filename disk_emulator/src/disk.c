@@ -126,8 +126,6 @@ internal drive_t *d_attach(uint8_t drive_num)
         return NULL;
     }
 
-    printf("%s\n", file);
-
     ret = open((const char *)file, O_RDWR);
     if (ret < 0)
     {
