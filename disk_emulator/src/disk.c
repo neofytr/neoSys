@@ -25,6 +25,11 @@ public drive_t *drive_test(uint8_t drive_num)
     return drive;
 }
 
+internal bool d_is_drivenum_valid(uint8_t drive_num)
+{
+    return (drive_num == DriveC || drive_num == DriveD);
+}
+
 internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
 {
     if (!drive || !dest)

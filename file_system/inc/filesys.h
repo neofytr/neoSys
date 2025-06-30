@@ -5,6 +5,8 @@
 #include <base.h>
 #include <disk.h>
 
+// a single drive will hold exactly one filesystem at one time
+
 /*
  * filesystem structure overview:
  *
@@ -151,5 +153,9 @@ internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force
 internal uint16_t fs_first_free(filesys_t *filesys);                                  // returns the blocknum of the first free block in the filesystem; returns 0 on error
 internal void fs_show(filesys_t *filesys, bool show_bitmap);                          // prints filesystem metadata
 internal bool fs_get_inode(filesys_t *filesys, uint16_t inode_index, inode_t *inode); // inode index starts from 0; returns false if inode_index is out of range; gets the inode with index inode_index
+
+internal filesys_t *fs_mount(uint8_t drive_num);
+internal bool fs_ismounted(uint8_t drive_num);
+internal void fs_unmount(filesys_t *filesys);
 
 #endif // FILESYS_H

@@ -6,7 +6,7 @@
 
 // we support only two drives for now, C and D
 #define DriveC 0x01 // 0001
-#define DriveD 0x20 // 0010
+#define DriveD 0x02 // 0010
 
 #define DRIVE_BASE_PATH "/home/raj/Desktop/neoSys/disk_emulator/drives/drive."
 #define BLOCK_SIZE (512)
@@ -21,6 +21,7 @@ typedef struct
 public
 drive_t *drive_test(uint8_t drive_num);
 
+internal d_is_drivenum_valid(uint8_t drive_num);
 internal drive_t *d_attach(uint8_t drive_num);
 internal bool d_detach(drive_t *drive);
 internal void d_show(drive_t *drive);

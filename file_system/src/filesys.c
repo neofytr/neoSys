@@ -12,6 +12,9 @@ private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
 private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
 private bool get_file_name(inode_t *inode, uint8_t *name);
 
+private uint8_t mounted = 0; // initially, no drive is mounted
+// last bit of mounted is DriveC and second last bit is DriveD
+
 public void
 filesys_test(drive_t *drive)
 {
@@ -108,6 +111,53 @@ internal bool fs_get_inode(filesys_t *filesys, uint16_t inode_index, inode_t *in
     return true;
 }
 
+internal bool fs_ismounted(uint8_t drive_num)
+{
+    if (!is_drivenum_valid(drive_num))
+        return false;
+
+    return mounted & drive_num;
+}
+
+internal filesys_t *fs_mount(uint8_t drive_num)
+{
+    drive_t *drive_desc;
+    filesys_t *filesys;
+    if (!d_is_drivenum_valid(drive_num))
+        return NULL;
+
+    if (fs_ismounted(drive_num))
+        return NULL;
+
+    drive_desc = d_attach(drive_num);
+    if (!drive_desc)
+        return NULL;
+
+    filesys = malloc(sizeof(filesys_t));
+    if (!filesys)
+        return NULL;
+
+    filesys->drive = drive_desc;
+    filesys->drive_num = drive_num;
+
+    if (!d_read(drive_desc, (uint8_t *)&filesys->super_block, 0))
+    {
+        free(filesys);
+        return false;
+    }
+
+    filesys->bitmap = fs_mkbitmap(filesys, true);
+    if (!filesys->bitmap)
+    {
+        free(filesys);
+        return false;
+    }
+
+    mounted |= drive_num;
+    return filesys;
+}
+
+// filesys should have it's drive and superblock field correctly initialized
 internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
 {
     uint16_t size, ptr, node, blocknum, indirect_ptr, blocks, blk, inode_blocks;

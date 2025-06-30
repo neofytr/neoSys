@@ -62,7 +62,9 @@
         "unistd.h": "c",
         "cinttypes": "c",
         "stdlib.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "cstdbool": "c",
+        "ios": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
