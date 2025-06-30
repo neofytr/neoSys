@@ -24,13 +24,13 @@
     if (!ret)                 \
         return EXIT_FAILURE;
 
-#define CFLAGS "-O2 -Wall -fPIC"  \
-               " -I " SYS INC     \
-               " -I " SHELL INC   \
-               " -I " OSAPI INC   \
-               " -I " DISK INC    \
-               " -I " FILESYS INC \
-               " -I " COMMON      \
+#define CFLAGS "-O2 -Wall -fPIC -g3" \
+               " -I " SYS INC        \
+               " -I " SHELL INC      \
+               " -I " OSAPI INC      \
+               " -I " DISK INC       \
+               " -I " FILESYS INC    \
+               " -I " COMMON         \
                " -I " LIB NEOSTD INC
 
 #define LFLAGS NULL

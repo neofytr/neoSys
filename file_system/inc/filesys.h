@@ -125,6 +125,9 @@ typedef union
     inode_t inode[INODES_PER_BLOCK]; // when block contains inode data (though typically 16 per block)
 } datablock_t;
 
+public
+void filesys_test(drive_t *drive);
+
 internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan); // returns NULL upon failure
 internal void fs_dltbitmap(bitmap_t bitmap);                  // destroys bitmap
 internal filesys_t *fs_format(drive_t *drive, bootsec_t *boot_sector, bool force);

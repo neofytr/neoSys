@@ -13,6 +13,18 @@
 // if drive D is attached, it will have it's 2nd LSB set and so on
 private uint8_t attached = 0;
 
+public drive_t *drive_test(uint8_t drive_num)
+{
+    if (drive_num != DriveC && drive_num != DriveD)
+        return NULL;
+
+    drive_t *drive = d_attach(drive_num);
+    if (!drive)
+        return NULL;
+
+    return drive;
+}
+
 internal bool d_read(drive_t *drive, uint8_t *dest, uint16_t block_num)
 {
     if (!drive || !dest)

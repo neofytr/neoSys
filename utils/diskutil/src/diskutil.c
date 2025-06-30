@@ -52,11 +52,11 @@ void cmd_format(char *arg1, char *arg2)
     {
     case 'c':
     case 'C':
-        drive = 1;
+        drive = DriveC;
         break;
     case 'd':
     case 'D':
-        drive = 2;
+        drive = DriveD;
         break;
     default:
         usage_format("diskutil");
@@ -79,11 +79,12 @@ void cmd_format(char *arg1, char *arg2)
         return;
     }
 
-    force = (force == 'y' || (char)force == 'Y') ? 0 : 1;
+    force = (force == 'y' || (char)force == 'Y') ? 1 : 0;
     if (!force)
         return;
 
     fprintf(stdout, "Formatting drive %s\n", drive_str);
+    fprintf(stdout, "drive: %d\n", drive);
     drive_desc = d_attach(drive);
     if (!drive_desc)
     {

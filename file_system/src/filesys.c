@@ -7,6 +7,12 @@ private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks);
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
 private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
 
+public void filesys_test(drive_t *drive)
+{
+    if (!fs_format(drive, NULL, true))
+        return;
+}
+
 internal bitmap_t fs_mkbitmap(filesys_t *filesys, bool scan)
 {
     uint16_t size, ptr, node, blocknum, indirect_ptr, blocks, blk, inode_blocks;
