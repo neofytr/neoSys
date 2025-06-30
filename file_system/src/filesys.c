@@ -258,7 +258,6 @@ internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
 }
 
 // buf should be of atleast 13 bytes
-// FIXED: Corrected name/extension order
 private bool get_file_name(inode_t *inode, uint8_t *buf)
 {
     uint8_t index;
