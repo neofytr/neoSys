@@ -26,7 +26,7 @@ Block 1 to n are inode blocks.
 They are 10% (rounded up) of the total blocks on the drive.
 Each inode block contains 16, 32-byte inodes, indexed from 0 to 31 (inode_index_in_block)
 The inode index of an inode is given by ((inode_block_index - 1) * INODES_PER_BLOCK) + inode_index_in_block
-
+The inode block index of an inode is given by (inode_index / INODES_PER_BLOCK) + 1
 All indexes START from 0.
 
 */
@@ -73,7 +73,7 @@ typedef struct packed
     uint16_t reserved;     // padding/future use
     uint16_t blocks;       // total blocks in filesystem
     uint16_t inode_blocks; // how many blocks are used for inodes
-    uint16_t inodes;       // total number of inodes available
+    uint16_t inodes;       // total number of inodes currently used (and NOT the total possible number of inodes)
     uint16_t magic1;       // filesystem signature part 1
     uint16_t magic2;       // filesystem signature part 2
 } superblock_t;            // packed ensures that this structure is always 512 bytes

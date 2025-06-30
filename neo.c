@@ -30,6 +30,7 @@
     if (!ret)                 \
         return EXIT_FAILURE;
 
+#define DEBUG
 #define CFLAGS "-O2 -Wall -fPIC"     \
                " -I " SYS INC        \
                " -I " SHELL INC      \

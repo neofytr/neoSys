@@ -4,11 +4,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define BUF_LEN_FOR_FILENAME (13) // 8 (name) + 3 (extension) + 1 (dot) + 1 (null byte)
+
 private uint16_t find_free_block(bitmap_t bitmap, uint16_t total_blocks);
 private bool mark_block_used(bitmap_t bitmap, uint16_t block_num);
 private void mark_block_free(bitmap_t bitmap, uint16_t block_num);
+private bool get_file_name(inode_t *inode, uint8_t *name);
 
-public void filesys_test(drive_t *drive)
+public void
+filesys_test(drive_t *drive)
 {
     filesys_t *filesys = NULL;
     if (!(filesys = fs_format(drive, NULL, true)))
@@ -137,10 +141,35 @@ internal void fs_dltbitmap(bitmap_t bitmap) // destroys bitmap
     return;
 }
 
+// buf should be of atleast 13 bytes
+private bool get_file_name(inode_t *inode, uint8_t *buf)
+{
+    uint8_t index;
+    uint8_t *ext;
+    uint8_t *name;
+    if (!inode || !buf)
+        return false;
+
+    index = 0;
+    ext = inode->file_name.extension;
+    name = inode->file_name.name;
+
+    while (index < FILEEXT_LEN && *ext)
+        buf[index++] = *ext++;
+    buf[index++] = '.';
+    while (index < BUF_LEN_FOR_FILENAME && *name)
+        buf[index++] = *name++;
+    buf[index] = '\0';
+    return true;
+}
+
 internal void fs_show(filesys_t *filesys, bool show_bitmap)
 {
     uint16_t i, j, used_blocks, free_blocks;
+    uint16_t total_used_inodes, index;
     bitmap_t bitmap;
+    inode_t inode;
+    uint8_t buf[BUF_LEN_FOR_FILENAME];
 
     if (!filesys)
         return;
@@ -155,6 +184,24 @@ internal void fs_show(filesys_t *filesys, bool show_bitmap)
     printf("inode blocks: %d\n", filesys->super_block.inode_blocks);
     printf("total inodes: %d\n", filesys->super_block.inodes);
     printf("magic numbers: 0x%04x 0x%04x\n", filesys->super_block.magic1, filesys->super_block.magic2);
+
+    // print all inodes
+    printf("\n");
+    printf("inode table:\n");
+    printf("============\n");
+
+    total_used_inodes = filesys->super_block.inodes;
+    for (index = 0; index < total_used_inodes; index++)
+    {
+        if (!fs_get_inode(filesys, index, &inode))
+            return;
+
+        if (!get_file_name(&inode, buf))
+            return;
+        printf("inode_index %d: type=%d, file_size=%d (bytes), file_name=%s\n", index, inode.file_type, inode.file_size, (char *)buf);
+    }
+
+    printf("\n");
 
     // calculate used/free blocks from bitmap
     bitmap = filesys->bitmap;
