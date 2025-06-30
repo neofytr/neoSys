@@ -21,7 +21,7 @@ typedef struct
 public
 drive_t *drive_test(uint8_t drive_num);
 
-internal d_is_drivenum_valid(uint8_t drive_num);
+internal bool d_is_drivenum_valid(uint8_t drive_num);
 internal drive_t *d_attach(uint8_t drive_num);
 internal bool d_detach(drive_t *drive);
 internal void d_show(drive_t *drive);

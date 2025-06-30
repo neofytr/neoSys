@@ -113,7 +113,7 @@ internal bool fs_get_inode(filesys_t *filesys, uint16_t inode_index, inode_t *in
 
 internal bool fs_ismounted(uint8_t drive_num)
 {
-    if (!is_drivenum_valid(drive_num))
+    if (!d_is_drivenum_valid(drive_num))
         return false;
 
     return mounted & drive_num;
@@ -511,8 +511,9 @@ internal void fs_unmount(filesys_t *filesys)
     // free bitmap
     fs_dltbitmap(filesys->bitmap);
     d_detach(filesys->drive);
-    free(filesys);
 
     kprintf("Drive %s unmounted", d_getdrivename(filesys->drive_num));
+    free(filesys);
+
     return;
 }
